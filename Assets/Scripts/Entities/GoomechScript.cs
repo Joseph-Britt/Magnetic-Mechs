@@ -37,10 +37,10 @@ public class GoomechScript : MonoBehaviour
     [Header("Sensors")]
     public float horizontalCheckLength = .65f;
     public float groundCheckHeight = 1f;
-    private bool approachingWall = false;
-    private bool approachingEnemy = false;
-    private bool approachingSpike = false;
-    private bool groundInFront = true;
+    protected bool approachingWall = false;
+    protected bool approachingEnemy = false;
+    protected bool approachingSpike = false;
+    protected bool groundBeneath = true;
 
     [Header("Statistics")]
     public float health;
@@ -52,7 +52,7 @@ public class GoomechScript : MonoBehaviour
     private float knockbackTime = 0.20f;
     public bool movementEnabled;
 
-    private void Awake()
+    protected void Awake()
     {
         if (includePrompt)
         {
@@ -84,8 +84,8 @@ public class GoomechScript : MonoBehaviour
         approachingWall = Physics2D.Raycast(transform.position, facingRight ? Vector2.right : Vector2.left, horizontalCheckLength, groundLayer);
         approachingSpike = Physics2D.Raycast(transform.position, facingRight ? Vector2.right : Vector2.left, horizontalCheckLength *1.65f, spikeLayer);
         approachingEnemy = Physics2D.Raycast(transform.position + Vector3.right * (horizontalCheckLength - .01f) * (facingRight ? 1 : -1), facingRight ? Vector2.right : Vector2.left, horizontalCheckLength, enemyLayer);
-        groundInFront = Physics2D.Raycast(transform.position + Vector3.right * horizontalCheckLength * (facingRight ? 1 : -1), Vector2.down, groundCheckHeight, groundLayer);
-        if (approachingWall || approachingEnemy || approachingSpike || !groundInFront)
+        groundBeneath = Physics2D.Raycast(transform.position + Vector3.right * horizontalCheckLength * (facingRight ? 1 : -1), Vector2.down, groundCheckHeight, groundLayer);
+        if (approachingWall || approachingEnemy || approachingSpike || !groundBeneath)
         {
             Flip();
         }
@@ -127,7 +127,7 @@ public class GoomechScript : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, facingRight ? 0 : 180, 0);
         myRigidBody2D.linearVelocity = new Vector3(-myRigidBody2D.linearVelocity.x, myRigidBody2D.linearVelocity.y, 0);
     }
-    private void handleTargetingReticle()
+    protected void handleTargetingReticle()
     {
         //turns the targeting prompt on and off during the tutorial
         if (playerTransform == null||shootingPromptScript == null) return;
