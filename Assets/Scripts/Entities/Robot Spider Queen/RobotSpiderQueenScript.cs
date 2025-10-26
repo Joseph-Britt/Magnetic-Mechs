@@ -31,6 +31,7 @@ public class RobotSpiderQueenScript : MonoBehaviour
     public Rigidbody2D myRigidbody2D;
     public SpriteRenderer sprite;
     public AudioSource backgroundMusic;
+    public AudioManager audioManager;
     [Header("Sensors")]
     public float horizontalCheckLength = .65f;
     public float groundCheckHeight = 1f;
@@ -198,13 +199,19 @@ public class RobotSpiderQueenScript : MonoBehaviour
         wideAttackScript.TriggerStage2();
         laserScript.TriggerStage2();
         AudioClip loadedClip = Resources.Load<AudioClip>("BackgroundMusic/the_robot_spider_queen_invasion_Part3");
-        if (backgroundMusic != null && loadedClip != null)
+        if (backgroundMusic != null && loadedClip != null && audioManager != null)
         {
-            backgroundMusic.clip = loadedClip;
-            backgroundMusic.Play();
+            StartCoroutine(SwapMusic(loadedClip));
         }
     }
-
+    public IEnumerator SwapMusic(AudioClip loadedClip)
+    {
+        audioManager.fade(1.25f);
+        yield return new WaitForSeconds(1.5f);
+        audioManager.stopFade();
+        backgroundMusic.clip = loadedClip;
+        backgroundMusic.Play();
+    }
     public void ShootWideAttack()
     {
         wideAttackScript.startLaser();

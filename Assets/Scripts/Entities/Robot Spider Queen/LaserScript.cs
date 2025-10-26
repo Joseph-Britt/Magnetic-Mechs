@@ -122,10 +122,10 @@ public class LaserScript : MonoBehaviour
             laserAngle = (float)(rounded * 90) % 360;
             startingAngle = laserAngle;
             transform.rotation = Quaternion.Euler(Vector3.forward * laserAngle);
-            if (playerPositionAngle > laserAngle)
-            {
-                rotationSpeed *= -1;
-            }
+            //if (playerPositionAngle > laserAngle)
+            //{
+            //    rotationSpeed *= -1;
+            //}
         }
         laserPointer.enabled = true;
         laserPointer.startColor = Color.red;
@@ -160,6 +160,12 @@ public class LaserScript : MonoBehaviour
         }
         laserPointer.enabled = false;
         yield return new WaitForSeconds(.1f);
+        Vector3 relativePositionToTarget = playerTransform.position - gameObject.transform.position;
+        float playerPositionAngle = Mathf.Atan2(relativePositionToTarget.y, relativePositionToTarget.x) * Mathf.Rad2Deg;
+        if (playerPositionAngle > laserAngle)
+        {
+            rotationSpeed *= -1;
+        }
         enableLaserRenderer();
     }
     private void ShootLaser(Transform laserSpawnPoint, LineRenderer lineRenderer)

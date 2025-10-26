@@ -774,7 +774,9 @@ public class PlayerScript : MonoBehaviour
         }
         if (magnetDistance < (maximumMagnetDistance))
         {
-            magnetVisualEffectScript.StartMagnetEffect(repelOn);
+            float size = 1 - 1.5f * (magnetDistance - 1.1f) / maximumMagnetDistance;
+            size = Mathf.Max(size, 0f);
+            magnetVisualEffectScript.StartMagnetEffect(repelOn, size);
             applyMagnetism(magnetRelativePosition.normalized, magnetDistance);
         }
     }

@@ -30,7 +30,7 @@ public class TutorialAllPrompts : MonoBehaviour
     private string shootingK = "Hold the Left Mouse Button To Shoot";
     private string jumpingK = "Press Space to Jump. Hold Space Mid-air to Use Jetpack";
     private string afterJumpKG = "Your Jetpack Will Refill Immediately on the Ground and Slowly Mid-air After Not Using it for Long Enough";
-    private string magnetingK = "Right Click to Shoot Magnet. Hold \"Q\" to Repel and \"E\" to Attract";
+    private string magnetingK = "Right Click to Shoot Magnet. Hold \"W\" to Repel and \"S\" to Attract";
     private string dropK = "Hold \"S\" To Drop Through Wooden Floors";
     private string killingPilotK= "Hold \"G\" + \"L\"";
     [Header("Prompt Output Strings gamePad")]

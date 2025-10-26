@@ -18,6 +18,7 @@ public class BossTriggerScript : MonoBehaviour
     public GameObject virtualCameraBoss;
     //public GameObject cameraPosition;
     public AudioSource audioSource;
+    public AudioManager audioManager;
     // Start is called before the first frame update
     void Start()
     {
@@ -47,10 +48,23 @@ public class BossTriggerScript : MonoBehaviour
             AudioClip loadedClip = Resources.Load<AudioClip>("BackgroundMusic/the_robot_spider_queen_invasion_Part2");
             if (loadedClip != null)
             {
-                audioSource.clip = loadedClip;
-                audioSource.Play();
+                StartCoroutine(SwapMusic(loadedClip));
             }
-            gameObject.SetActive(false);
         }
+    }
+    public IEnumerator SwapMusic(AudioClip loadedClip)
+    {
+        audioManager.fade(3f);
+        Debug.Log("test1");
+        yield return new WaitForSeconds(5f);
+        Debug.Log("test2");
+        //audioManager.stopFade();
+        audioSource.clip = loadedClip;
+        audioSource.Play();
+        turnOffGameObject();
+    }
+    private void turnOffGameObject()
+    {
+        gameObject.SetActive(false);
     }
 }

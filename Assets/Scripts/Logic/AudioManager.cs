@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
@@ -12,6 +13,9 @@ public class AudioManager : MonoBehaviour
     private AudioMixerGroup musicGroup;
     private AudioSource[] allSources;
     private bool volumeLoaded;
+
+    [Header("Fade")]
+    private float fadeRatio = 1.0f;
 
     void Start()
     {
@@ -43,7 +47,7 @@ public class AudioManager : MonoBehaviour
         float sfxVolume = sfxSlider.value;
         float musicVolume = musicSlider.value;
         mixer.SetFloat("SFXVolume", Mathf.Log10(sfxVolume) * 20);
-        mixer.SetFloat("MusicVolume", Mathf.Log10(musicVolume) * 20);
+        mixer.SetFloat("MusicVolume", Mathf.Log10(musicVolume) * 20 * fadeRatio);
         PlayerPrefs.SetFloat("sfxVolume", sfxVolume);
         PlayerPrefs.SetFloat("musicVolume", musicVolume);
     }
@@ -65,5 +69,25 @@ public class AudioManager : MonoBehaviour
 
         volumeLoaded = true;
         SetAudioVolume();
+    }
+    public void fade(float duration)
+    {
+        StartCoroutine(Fading(duration));
+    }
+    public IEnumerator Fading(float duration)
+    {
+        float timer = 0;
+        Debug.Log("audio");
+        while(timer < duration)
+        {
+            Debug.Log(fadeRatio);
+            timer += .01f;
+            fadeRatio = Mathf.Lerp(1f, 0f, timer / duration);
+            yield return new WaitForSeconds(.01f);
+        }
+    }
+    public void stopFade()
+    {
+        fadeRatio = 1f;
     }
 }

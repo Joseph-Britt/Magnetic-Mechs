@@ -25,7 +25,7 @@ public class ExplosionScript : MonoBehaviour
     IEnumerator HandleDeath()
     {
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
-        animator.SetBool("hasDied", false);
+        //animator.SetBool("hasDied", false);
         if (laserScript != null)
         {
             laserScript.ExplosionKilled(index);

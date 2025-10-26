@@ -36,7 +36,7 @@ public class MagnetVisualEffectScript : MonoBehaviour
         spawnTimer += Time.deltaTime;
     }
 
-    public void StartMagnetEffect(bool repel)
+    public void StartMagnetEffect(bool repel, float size)
     {
         if (spawnTimer > timeBetweenSpawns)
         {
@@ -44,6 +44,9 @@ public class MagnetVisualEffectScript : MonoBehaviour
             HandleOrientation();
             CreateEffect(repel);
         }
+        effectsArray[0].transform.localScale = new Vector3 (size, size, size);
+        effectsArray[1].transform.localScale = new Vector3(size, size, size);
+        effectsArray[2].transform.localScale = new Vector3(size, size, size);
     }
     private void HandleOrientation()
     {

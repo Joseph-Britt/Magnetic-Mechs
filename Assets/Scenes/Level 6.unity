@@ -280,6 +280,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 418094204194523359, guid: 0f0dbb7dca184be40ad22aa1dc5d1024, type: 3}
+      propertyPath: virtualCamera
+      value: 
+      objectReference: {fileID: 794662278}
     - target: {fileID: 5199636598706061136, guid: 0f0dbb7dca184be40ad22aa1dc5d1024, type: 3}
       propertyPath: m_LocalPosition.x
       value: 66.73
@@ -8817,12 +8821,12 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: ef02470d28a386f4cbe5bb5697a5a03a, type: 3}
-  m_Resource: {fileID: 8300000, guid: ef02470d28a386f4cbe5bb5697a5a03a, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 375b0e0230474b0499534d59bfdbd3a8, type: 3}
+  m_Resource: {fileID: 8300000, guid: 375b0e0230474b0499534d59bfdbd3a8, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.5
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -77551,6 +77555,10 @@ PrefabInstance:
       propertyPath: checkpoint
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 418094204194523359, guid: 0f0dbb7dca184be40ad22aa1dc5d1024, type: 3}
+      propertyPath: virtualCamera
+      value: 
+      objectReference: {fileID: 794662278}
     - target: {fileID: 5199636598706061136, guid: 0f0dbb7dca184be40ad22aa1dc5d1024, type: 3}
       propertyPath: m_LocalPosition.x
       value: -65.45

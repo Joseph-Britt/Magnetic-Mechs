@@ -68,4 +68,9 @@ public class PlayerHealthScript : MonoBehaviour
     {
         return maxHealth;
     }
+    public void healToFull()
+    {
+        currentHealth = maxHealth;
+        HealthSystem.GetComponent<HealthHeartScript>().UpdateHeartsHUD();
+    }
 }

@@ -34403,6 +34403,7 @@ MonoBehaviour:
   virtualCameraPlayer: {fileID: 724935077}
   virtualCameraBoss: {fileID: 1243902499}
   audioSource: {fileID: 1931092916}
+  audioManager: {fileID: 55331400}
 --- !u!61 &1793572570
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -35214,6 +35215,7 @@ MonoBehaviour:
   myRigidbody2D: {fileID: 0}
   sprite: {fileID: 0}
   backgroundMusic: {fileID: 1931092916}
+  audioManager: {fileID: 55331400}
   horizontalCheckLength: 5
   groundCheckHeight: 3
   rockSpawnerScript: {fileID: 954579423}
