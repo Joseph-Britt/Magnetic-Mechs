@@ -344,7 +344,7 @@
                 {
                     "name": "",
                     "id": "d1e74dd0-0832-4527-984d-d7ac61423e61",
-                    "path": "<Keyboard>/w",
+                    "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse;Gamepad",
@@ -421,7 +421,7 @@
                 {
                     "name": "",
                     "id": "409d7432-e5f7-4d22-8b64-2f618a4c80d9",
-                    "path": "<Keyboard>/s",
+                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",

@@ -44,7 +44,7 @@ public class GoomechScript : MonoBehaviour
 
     [Header("Statistics")]
     public float health;
-    public float startingHealth = 3;
+    private float startingHealth = 1;
     private bool isAlive = true;
     public bool includePrompt = false;
 

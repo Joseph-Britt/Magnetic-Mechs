@@ -15,6 +15,7 @@ public class BeeBossScript : MonoBehaviour
     public SpriteRenderer sprite;
     public Transform playerTransform;
     public GameObject endingPlatformGrid;
+    public GameObject StartNextLevel;
 
 
     void Awake()
@@ -70,6 +71,7 @@ public class BeeBossScript : MonoBehaviour
         //Destroy(gameObject);
         transform.parent.GetComponent<BeeBossParentScript>().beeBossActive = false;
         endingPlatformGrid.SetActive(true);
+        StartNextLevel.SetActive(true);
         gameObject.SetActive(false);
 
     }
