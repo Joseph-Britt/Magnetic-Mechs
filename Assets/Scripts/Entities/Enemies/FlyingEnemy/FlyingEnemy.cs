@@ -21,6 +21,7 @@ public class FlyingEnemy : MonoBehaviour
     public BoxCollider2D myCollider;
     public Animator animator;
     public AudioSource DeathSound;
+    public DroneRespawnerScript droneRespawnerScript;
 
     [Header("Sensors")]
     public float horizontalCheckLength = .65f;
@@ -29,6 +30,7 @@ public class FlyingEnemy : MonoBehaviour
     [Header("Statistics")]
     public float health;
     public float startingHealth = 3;
+    public int index = 0;
     private bool isAlive = true;
     private bool movementEnabled = true;
 
@@ -61,7 +63,14 @@ public class FlyingEnemy : MonoBehaviour
                 verticalDirection = -1;
                 switchCounter = switchTime;
             }
-            myRigidBody2D.linearVelocity = new Vector3(4f, verticalSpeed * verticalDirection, 0f);
+            if (droneRespawnerScript == null)
+            {
+                myRigidBody2D.linearVelocity = new Vector3(4f, verticalSpeed * verticalDirection, 0f);
+            }
+            else
+            {
+                myRigidBody2D.linearVelocity = new Vector3(0f, verticalSpeed * verticalDirection, 0f);
+            }
         }
 
         if (switchCounter <= 0)
@@ -92,6 +101,16 @@ public class FlyingEnemy : MonoBehaviour
             TakeDamage(1);
         }
     }
+    public void restartDrone()
+    {
+        health = startingHealth;
+        animator.Play("Movement");
+        isAlive = true;
+        myCollider.enabled = true;
+        movementEnabled = true;
+        Debug.Log("Drone Restarted.");
+    }
+
     void TakeDamage(float Damage)
     {
         health -= Damage;
@@ -120,5 +139,9 @@ public class FlyingEnemy : MonoBehaviour
         yield return new WaitUntil(() => gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Dead"));
         animator.SetBool("hasDied", false);
         gameObject.SetActive(false);
+        if (droneRespawnerScript != null)
+        {
+            droneRespawnerScript.DroneKilled(index);
+        }
     }
 }
