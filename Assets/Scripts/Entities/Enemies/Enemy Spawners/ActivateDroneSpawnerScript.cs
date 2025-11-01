@@ -12,3 +12,4 @@ public class ActivateDroneSpawnerScript : MonoBehaviour
         if (collision.gameObject.layer == 3 && droneSpawnerScript != null) droneSpawnerScript.Activate();
     }
 }
+
