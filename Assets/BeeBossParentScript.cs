@@ -27,7 +27,8 @@ public class BeeBossParentScript : MonoBehaviour
         if (beeBossActive)
         {
             Vector2 moveHorizontal = Vector2.right * speed;
-            myRigidbody2D.MovePosition(myRigidbody2D.position + moveHorizontal * Time.fixedDeltaTime);
+            this.transform.Translate(moveHorizontal * Time.fixedDeltaTime);
+            //myRigidbody2D.MovePosition(myRigidbody2D.position + moveHorizontal * Time.fixedDeltaTime);
         }
     }
     public void Activate()

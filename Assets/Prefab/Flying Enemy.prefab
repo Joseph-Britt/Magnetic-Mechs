@@ -204,18 +204,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   verticalSpeed: 2
-  movementRange: 10
+  startingY: 0
   switchTime: 3
   switchCounter: 0
+  verticalDirection: 1
+  upperVerticalBound: {fileID: 0}
+  lowerVerticalBound: {fileID: 0}
   playerTransform: {fileID: 0}
   myRigidBody2D: {fileID: 0}
   myCollider: {fileID: 0}
   animator: {fileID: 0}
   DeathSound: {fileID: 2883544419593968715}
+  droneRespawnerScript: {fileID: 0}
+  flyingEnemyBulletSpawnerScript: {fileID: 6720084548395390984}
   horizontalCheckLength: 0.65
   groundCheckHeight: 1
   health: 0
-  startingHealth: 3
+  index: 0
 --- !u!114 &6720084548395390984
 MonoBehaviour:
   m_ObjectHideFlags: 0
