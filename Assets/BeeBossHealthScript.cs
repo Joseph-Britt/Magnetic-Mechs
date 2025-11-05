@@ -10,6 +10,7 @@ public class BeeBossHealthScript : MonoBehaviour
     //public GameObject Player;
     public BeeBossScript beeBossScript;
     public BeeBossParentScript beeBossParentScript;
+    public DroneRespawnerScript droneRespawnerScript;
     public Image remainingHealth;
     public LogicScript logic;
     [Header("Health")]
@@ -50,6 +51,7 @@ public class BeeBossHealthScript : MonoBehaviour
         else if (!inStage2 && currentHealth <= maxHealth * 2 / 3)
         {
             beeBossParentScript.ActivateStage2();
+            droneRespawnerScript.ActivatePhase2();
             inStage2 = true;
         }
     }

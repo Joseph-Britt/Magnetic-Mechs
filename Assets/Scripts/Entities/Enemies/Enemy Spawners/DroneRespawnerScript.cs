@@ -25,7 +25,7 @@ public class DroneRespawnerScript : MonoBehaviour
     private void Start()
     {
         timeToSpawn = 5;
-        timer = 0;
+        timer = timeToSpawn;
         myTransform = transform;
         SetUpArrays();
     }
@@ -47,8 +47,8 @@ public class DroneRespawnerScript : MonoBehaviour
             tempDroneScript.lowerVerticalBound = minYPosition;
             tempDroneScript.upperVerticalBound = maxYPosition;
             tempDroneScript.switchTime = 4f;
-            DronesAvailableQueue.Enqueue(i);
         }
+        DronesAvailableQueue.Enqueue(0);
     }
     // Update is called once per frame
     void FixedUpdate()
@@ -84,5 +84,10 @@ public class DroneRespawnerScript : MonoBehaviour
     {
         DronesAvailableQueue.Enqueue(index);
         DronesArray[index].gameObject.SetActive(false);
+    }
+    public void ActivatePhase2()
+    {
+        DronesAvailableQueue.Enqueue(1);
+        timeToSpawn = 4.5f;
     }
 }
