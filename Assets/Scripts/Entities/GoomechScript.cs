@@ -12,6 +12,7 @@ public class GoomechScript : MonoBehaviour
     public float startingTime = 2f;
     public float startingSpeed = 1.5f;
     public int index;
+    public bool initialFaceRight = true;
 
     [Header("Horizontal Movement")]
     public float speed = 3;
@@ -45,7 +46,7 @@ public class GoomechScript : MonoBehaviour
     [Header("Statistics")]
     public float health;
     private float startingHealth = 1;
-    private bool isAlive = true;
+    protected bool isAlive = true;
     public bool includePrompt = false;
 
     [Header("Knockback")]
