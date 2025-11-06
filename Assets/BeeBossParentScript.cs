@@ -10,7 +10,7 @@ public class BeeBossParentScript : MonoBehaviour
     public CeilingLaserScript ceilingLaserScript;
     public RockSpawnerScript rockSpawnerScript;
     [Header("variables")]
-    private bool beeBossActive;
+    public bool beeBossActive;
     private float speed;
     [Header("Stages")]
     private float Stage1Speed = 4f;
@@ -27,7 +27,8 @@ public class BeeBossParentScript : MonoBehaviour
         if (beeBossActive)
         {
             Vector2 moveHorizontal = Vector2.right * speed;
-            myRigidbody2D.MovePosition(myRigidbody2D.position + moveHorizontal * Time.fixedDeltaTime);
+            this.transform.Translate(moveHorizontal * Time.fixedDeltaTime);
+            //myRigidbody2D.MovePosition(myRigidbody2D.position + moveHorizontal * Time.fixedDeltaTime);
         }
     }
     public void Activate()

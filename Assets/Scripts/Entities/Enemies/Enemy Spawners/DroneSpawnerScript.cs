@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework.Internal.Filters;
 using UnityEngine;
 
 public class DroneSpawnerScript : MonoBehaviour
@@ -111,6 +112,10 @@ public class DroneSpawnerScript : MonoBehaviour
     public void Activate()
     {
         active = true;
+    }
+    public void Deactivate()
+    {
+        active = false;
     }
     void spawnDrone()
     {

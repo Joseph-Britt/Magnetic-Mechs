@@ -14,6 +14,8 @@ public class BeeBossScript : MonoBehaviour
     public BeeBossHealthScript beeBossHealthScript;
     public SpriteRenderer sprite;
     public Transform playerTransform;
+    public GameObject endingPlatformGrid;
+    public GameObject StartNextLevel;
 
 
     void Awake()
@@ -22,6 +24,7 @@ public class BeeBossScript : MonoBehaviour
         if (player != null) playerTransform = player.GetComponent<Transform>();
         else Debug.Log("player could not be found");
         sprite = GetComponent<SpriteRenderer>();
+        endingPlatformGrid.SetActive(false);
         bossActive = false;
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -66,6 +69,9 @@ public class BeeBossScript : MonoBehaviour
         yield return new WaitForSeconds(1);
         //yield return new WaitUntil(() => gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Dead"));
         //Destroy(gameObject);
+        transform.parent.GetComponent<BeeBossParentScript>().beeBossActive = false;
+        endingPlatformGrid.SetActive(true);
+        StartNextLevel.SetActive(true);
         gameObject.SetActive(false);
 
     }

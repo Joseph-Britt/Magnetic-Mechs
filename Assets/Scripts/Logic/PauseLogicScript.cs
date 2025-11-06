@@ -12,7 +12,7 @@ public class PauseLogicScript : MonoBehaviour
     }
     public void Pause()
     {
-        LogicScript.logicSingleton.Pause();
+        LogicScript.logicSingleton.SetPausePressed();
     }
     public void StartLevelSelect()
     {

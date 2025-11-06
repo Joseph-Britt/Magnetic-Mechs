@@ -126,6 +126,8 @@ public class PlayerScript : MonoBehaviour
     public MagnetSpawnerScript magnetSpawnerScript;
     private bool launchMagnet = false;
     private GameObject myMagnet;
+    private Vector2 magnetRelativePosition;
+    private float magnetDistance;
 
     [Header("Dust Effects")]
     public ParticleSystem changeDirectionDust;
@@ -766,8 +768,8 @@ public class PlayerScript : MonoBehaviour
     private void handleMagneticRepulsion()
     {
         if (myMagnet == null || !(repelOn ^ attractOn) || !magnetSpawnerScript.magnetActive) return;
-        Vector2 magnetRelativePosition = transform.position - myMagnet.transform.position;
-        float magnetDistance = magnetRelativePosition.magnitude;
+        magnetRelativePosition = transform.position - myMagnet.transform.position;
+        magnetDistance = magnetRelativePosition.magnitude;
         if (magnetDistance < 1.1f)
         {
             magnetDistance = 1.1f;
@@ -914,7 +916,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (context.performed)
         {
-            logic.Pause();
+            logic.SetPausePressed();
         }
     }
     private void OnDrawGizmos()

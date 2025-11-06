@@ -8,7 +8,8 @@ public class FlyingEnemyBulletSpawnerScript : BulletSpawnerParent
     public float shootingCounter;
     [Header("Player")]
     public GameObject player;
-
+    [Header("Components")]
+    private bool isAlive = true;
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
@@ -22,7 +23,7 @@ public class FlyingEnemyBulletSpawnerScript : BulletSpawnerParent
     // Update is called once per frame
     void Update()
     {
-        if (shootingCounter <= 0 && player != null && bulletsQueue.Count > 0)
+        if (shootingCounter <= 0 && player != null && bulletsQueue.Count > 0 && isAlive)
         {
             Shoot();
         }
@@ -34,5 +35,13 @@ public class FlyingEnemyBulletSpawnerScript : BulletSpawnerParent
         SpawnBullet();
         SpawnMuzzleEffect();
         audioBox.Play();
+    }
+    public void EnemyUnkilled()
+    {
+        isAlive = true;
+    }
+    public void EnemyKilled()
+    {
+        isAlive = false;
     }
 }
