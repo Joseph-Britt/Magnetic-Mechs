@@ -40,7 +40,7 @@ public class GoomechScript : MonoBehaviour
     protected bool approachingWall = false;
     protected bool approachingEnemy = false;
     protected bool approachingSpike = false;
-    protected bool groundBeneath = true;
+    protected bool onGround = true;
 
     [Header("Statistics")]
     public float health;
@@ -84,8 +84,8 @@ public class GoomechScript : MonoBehaviour
         approachingWall = Physics2D.Raycast(transform.position, facingRight ? Vector2.right : Vector2.left, horizontalCheckLength, groundLayer);
         approachingSpike = Physics2D.Raycast(transform.position, facingRight ? Vector2.right : Vector2.left, horizontalCheckLength *1.65f, spikeLayer);
         approachingEnemy = Physics2D.Raycast(transform.position + Vector3.right * (horizontalCheckLength - .01f) * (facingRight ? 1 : -1), facingRight ? Vector2.right : Vector2.left, horizontalCheckLength, enemyLayer);
-        groundBeneath = Physics2D.Raycast(transform.position + Vector3.right * horizontalCheckLength * (facingRight ? 1 : -1), Vector2.down, groundCheckHeight, groundLayer);
-        if (approachingWall || approachingEnemy || approachingSpike || !groundBeneath)
+        onGround = Physics2D.Raycast(transform.position + Vector3.right * horizontalCheckLength * (facingRight ? 1 : -1), Vector2.down, groundCheckHeight, groundLayer);
+        if (approachingWall || approachingEnemy || approachingSpike || !onGround)
         {
             Flip();
         }
