@@ -8,7 +8,8 @@ using UnityEngine.U2D;
  * This is the script for the WallGoomech prefab, a variant of goomech that crawls along walls and ceilings.
  * A few things to note:
  * They will never be deflected by walls or cliffs; they always respond to these situations by climbing the wall/cliff.
- * They will turn around on reaching a spike or another enemy
+ * They will turn around on reaching another enemy
+ * They walk through spikes
  * If you give a camera to the serialized field "cam", then they will only move when visible in that camera
  * If they are spawned in midair, they will fall straight down and latch onto the ground that they land on
  * Occasionally, if they are very dense in one area, they might begin to interact strangely (ex. rapid turns instead of flips). This isn't a problem unless they are closely packed.
@@ -101,7 +102,7 @@ public class WallGoomechScript : GoomechScript
         }
 
         // enemy or spike: turn around
-        if (approachingEnemy || approachingSpike)
+        if (approachingEnemy)
         {
             Flip();
         }
