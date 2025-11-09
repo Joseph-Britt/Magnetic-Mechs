@@ -96,4 +96,11 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             buttons[currentSelection].GetComponent<Button>().onClick.Invoke();
         }
     }
+
+    public void HoverButton(int hover)
+    {
+        currentSelection = hover;
+        readyToChange = Time.realtimeSinceStartup + delay;
+        SetButtonSize(currentSelection);
+    }
 }

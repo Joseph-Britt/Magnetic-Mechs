@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 16364826}
   - component: {fileID: 16364825}
   - component: {fileID: 16364824}
+  - component: {fileID: 16364827}
   m_Layer: 5
   m_Name: Stage 2 Button
   m_TagString: Untagged
@@ -204,14 +205,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage2
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 2
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &16364825
@@ -252,6 +253,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 16364822}
   m_CullTransparentMesh: 1
+--- !u!114 &16364827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 16364822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 1
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &76094717
 GameObject:
   m_ObjectHideFlags: 0
@@ -365,7 +395,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000061035156}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &111203450
@@ -418,6 +448,7 @@ GameObject:
   - component: {fileID: 134960018}
   - component: {fileID: 134960017}
   - component: {fileID: 134960016}
+  - component: {fileID: 134960019}
   m_Layer: 5
   m_Name: 'Stage 7 Button '
   m_TagString: Untagged
@@ -491,14 +522,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage7
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 7
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &134960017
@@ -539,6 +570,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 134960014}
   m_CullTransparentMesh: 1
+--- !u!114 &134960019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 134960014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 6
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &235405370
 GameObject:
   m_ObjectHideFlags: 0
@@ -736,6 +796,7 @@ GameObject:
   - component: {fileID: 256448762}
   - component: {fileID: 256448761}
   - component: {fileID: 256448760}
+  - component: {fileID: 256448763}
   m_Layer: 5
   m_Name: Stage 14 Button
   m_TagString: Untagged
@@ -809,14 +870,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage9
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 14
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &256448761
@@ -857,6 +918,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 256448758}
   m_CullTransparentMesh: 1
+--- !u!114 &256448763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256448758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 5
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &288118646
 GameObject:
   m_ObjectHideFlags: 0
@@ -1228,6 +1318,7 @@ GameObject:
   - component: {fileID: 658736409}
   - component: {fileID: 658736408}
   - component: {fileID: 658736407}
+  - component: {fileID: 658736410}
   m_Layer: 5
   m_Name: 'Stage 3 Button '
   m_TagString: Untagged
@@ -1301,14 +1392,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage3
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 3
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &658736408
@@ -1349,6 +1440,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 658736405}
   m_CullTransparentMesh: 1
+--- !u!114 &658736410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658736405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 2
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &759599466
 GameObject:
   m_ObjectHideFlags: 0
@@ -1440,6 +1560,7 @@ GameObject:
   - component: {fileID: 819718610}
   - component: {fileID: 819718609}
   - component: {fileID: 819718608}
+  - component: {fileID: 819718611}
   m_Layer: 5
   m_Name: Stage 16 Button
   m_TagString: Untagged
@@ -1513,14 +1634,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage9
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 16
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &819718609
@@ -1561,6 +1682,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 819718606}
   m_CullTransparentMesh: 1
+--- !u!114 &819718611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 819718606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 7
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &882391924
 GameObject:
   m_ObjectHideFlags: 0
@@ -1677,6 +1827,7 @@ GameObject:
   - component: {fileID: 891842273}
   - component: {fileID: 891842272}
   - component: {fileID: 891842271}
+  - component: {fileID: 891842274}
   m_Layer: 5
   m_Name: Stage 11 Button
   m_TagString: Untagged
@@ -1750,14 +1901,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage9
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 11
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &891842272
@@ -1798,6 +1949,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 891842269}
   m_CullTransparentMesh: 1
+--- !u!114 &891842274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891842269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 2
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &901911700
 GameObject:
   m_ObjectHideFlags: 0
@@ -1968,6 +2148,7 @@ GameObject:
   - component: {fileID: 1003271906}
   - component: {fileID: 1003271905}
   - component: {fileID: 1003271904}
+  - component: {fileID: 1003271907}
   m_Layer: 5
   m_Name: Stage 10 Button
   m_TagString: Untagged
@@ -2041,14 +2222,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage9
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 10
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1003271905
@@ -2089,6 +2270,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1003271902}
   m_CullTransparentMesh: 1
+--- !u!114 &1003271907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1003271902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 1
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!114 &1036343846 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 665256283618246213, guid: 088bdfad9b040fc48a3b78164e9cca25, type: 3}
@@ -2112,6 +2322,7 @@ GameObject:
   - component: {fileID: 1051649936}
   - component: {fileID: 1051649935}
   - component: {fileID: 1051649934}
+  - component: {fileID: 1051649937}
   m_Layer: 5
   m_Name: Stage 6 Button
   m_TagString: Untagged
@@ -2185,14 +2396,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage6
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 6
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1051649935
@@ -2233,6 +2444,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1051649932}
   m_CullTransparentMesh: 1
+--- !u!114 &1051649937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051649932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 5
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1066575436
 GameObject:
   m_ObjectHideFlags: 0
@@ -2245,6 +2485,7 @@ GameObject:
   - component: {fileID: 1066575440}
   - component: {fileID: 1066575439}
   - component: {fileID: 1066575438}
+  - component: {fileID: 1066575441}
   m_Layer: 5
   m_Name: 'Stage 8 Button '
   m_TagString: Untagged
@@ -2318,14 +2559,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage8
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 8
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1066575439
@@ -2366,6 +2607,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1066575436}
   m_CullTransparentMesh: 1
+--- !u!114 &1066575441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1066575436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 6
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1070979082
 GameObject:
   m_ObjectHideFlags: 0
@@ -2559,6 +2829,7 @@ GameObject:
   - component: {fileID: 1124522482}
   - component: {fileID: 1124522481}
   - component: {fileID: 1124522480}
+  - component: {fileID: 1124522483}
   m_Layer: 5
   m_Name: Stage 5 Button
   m_TagString: Untagged
@@ -2632,14 +2903,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage5
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 5
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1124522481
@@ -2680,6 +2951,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1124522478}
   m_CullTransparentMesh: 1
+--- !u!114 &1124522483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1124522478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 4
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1125052601
 GameObject:
   m_ObjectHideFlags: 0
@@ -2983,6 +3283,7 @@ GameObject:
   - component: {fileID: 1282356234}
   - component: {fileID: 1282356233}
   - component: {fileID: 1282356232}
+  - component: {fileID: 1282356235}
   m_Layer: 5
   m_Name: Stage 15 Button
   m_TagString: Untagged
@@ -3056,14 +3357,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage9
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 15
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1282356233
@@ -3104,6 +3405,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1282356230}
   m_CullTransparentMesh: 1
+--- !u!114 &1282356235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1282356230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 6
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1292091553
 GameObject:
   m_ObjectHideFlags: 0
@@ -3366,6 +3696,7 @@ GameObject:
   - component: {fileID: 1443528629}
   - component: {fileID: 1443528628}
   - component: {fileID: 1443528627}
+  - component: {fileID: 1443528630}
   m_Layer: 5
   m_Name: Stage 4 Button
   m_TagString: Untagged
@@ -3439,14 +3770,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage4
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 4
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1443528628
@@ -3487,6 +3818,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1443528625}
   m_CullTransparentMesh: 1
+--- !u!114 &1443528630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1443528625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 3
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1446366176
 GameObject:
   m_ObjectHideFlags: 0
@@ -3499,6 +3859,7 @@ GameObject:
   - component: {fileID: 1446366180}
   - component: {fileID: 1446366179}
   - component: {fileID: 1446366178}
+  - component: {fileID: 1446366181}
   m_Layer: 5
   m_Name: Stage 12 Button
   m_TagString: Untagged
@@ -3572,14 +3933,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage9
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 12
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1446366179
@@ -3620,6 +3981,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1446366176}
   m_CullTransparentMesh: 1
+--- !u!114 &1446366181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1446366176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 3
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1544086715
 GameObject:
   m_ObjectHideFlags: 0
@@ -3790,6 +4180,7 @@ GameObject:
   - component: {fileID: 1638505138}
   - component: {fileID: 1638505137}
   - component: {fileID: 1638505136}
+  - component: {fileID: 1638505139}
   m_Layer: 5
   m_Name: 'Stage 9 Button '
   m_TagString: Untagged
@@ -3863,14 +4254,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage9
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 9
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1638505137
@@ -3911,6 +4302,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1638505134}
   m_CullTransparentMesh: 1
+--- !u!114 &1638505139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1638505134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1691087451
 GameObject:
   m_ObjectHideFlags: 0
@@ -3923,6 +4343,7 @@ GameObject:
   - component: {fileID: 1691087455}
   - component: {fileID: 1691087454}
   - component: {fileID: 1691087453}
+  - component: {fileID: 1691087456}
   m_Layer: 5
   m_Name: Stage 1 Button
   m_TagString: Untagged
@@ -3996,14 +4417,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage1
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 1
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1691087454
@@ -4044,6 +4465,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1691087451}
   m_CullTransparentMesh: 1
+--- !u!114 &1691087456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1691087451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1723728804
 GameObject:
   m_ObjectHideFlags: 0
@@ -4282,6 +4732,7 @@ GameObject:
   - component: {fileID: 1769088060}
   - component: {fileID: 1769088059}
   - component: {fileID: 1769088058}
+  - component: {fileID: 1769088061}
   m_Layer: 5
   m_Name: Stage 13 Button
   m_TagString: Untagged
@@ -4355,14 +4806,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1070979083}
         m_TargetAssemblyTypeName: StartScreenLogic, Assembly-CSharp
-        m_MethodName: StartStage9
-        m_Mode: 1
+        m_MethodName: StartStage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Level 13
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1769088059
@@ -4403,6 +4854,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1769088056}
   m_CullTransparentMesh: 1
+--- !u!114 &1769088061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1769088056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 255114878}
+          m_TargetAssemblyTypeName: MainMenuButtonSelectionManager, Assembly-CSharp
+          m_MethodName: HoverButton
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 4
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1787320087
 GameObject:
   m_ObjectHideFlags: 0
