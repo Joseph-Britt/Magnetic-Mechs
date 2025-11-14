@@ -57,7 +57,6 @@ public class PlayerAnimationManagerScript : MonoBehaviour
     public void setFiringAngle(float originalAngle)
     {
         float angle = convertToPolarCoordinates(originalAngle);
-        Debug.Log(angle);
         if(angle < 0) 
         {
             upperBodyGameObject.transform.rotation = Quaternion.Euler(0, 180, 0);

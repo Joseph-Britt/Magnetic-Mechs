@@ -84352,11 +84352,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8141795761595354129, guid: 2d3ee4af33afb8e49b2b6929f3cd443c, type: 3}
       propertyPath: MaxXDistance
-      value: 18
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8141795761595354129, guid: 2d3ee4af33afb8e49b2b6929f3cd443c, type: 3}
       propertyPath: MaxYDistance
-      value: 28
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8141795761595354129, guid: 2d3ee4af33afb8e49b2b6929f3cd443c, type: 3}
       propertyPath: uniformSpeed
@@ -84364,7 +84364,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8141795761595354129, guid: 2d3ee4af33afb8e49b2b6929f3cd443c, type: 3}
       propertyPath: XSpawnDistance
-      value: 15
+      value: 23
       objectReference: {fileID: 0}
     - target: {fileID: 8141795761595354129, guid: 2d3ee4af33afb8e49b2b6929f3cd443c, type: 3}
       propertyPath: playerTransform

@@ -58,6 +58,7 @@ public class PlayerScript : MonoBehaviour
 
     [Header("Collision")]
     public bool onGround = false;
+    public bool overlappingGround = false;
     public bool trulyOnGround = false;
     public bool nearGround = false;
     private float groundLength = .9f;
@@ -203,8 +204,9 @@ public class PlayerScript : MonoBehaviour
             }
         }
         onGround = (Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, groundLength, groundLayer));
-        trulyOnGround = onGround && !(Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, legLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, legLength, groundLayer));
-        nearGround = (Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, nearGroundLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, nearGroundLength, groundLayer));
+        overlappingGround = (Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, legLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, legLength, groundLayer));
+        trulyOnGround = onGround && !overlappingGround;
+        nearGround = Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, nearGroundLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, nearGroundLength, groundLayer) && !overlappingGround;
         if (playerAlive)
         {
             //playerAnimationManagerScript.setLanding(trulyOnGround, onGround, myRigidbody2D.linearVelocity.y);
@@ -668,6 +670,7 @@ public class PlayerScript : MonoBehaviour
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
+        Debug.Log("collision happened");
         if (!isCharging)
         {
             if (collision.gameObject.layer == 7) // enemy
