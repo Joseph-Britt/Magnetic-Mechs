@@ -13,6 +13,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
     public Transform buttonParent;
     public Transform page1Parent;
     public Transform page2Parent;
+    public GameObject currentLevelCapacitor;
     [Header("Variables")]
     public List<GameObject> buttons;
     public List<GameObject> page1Buttons;
@@ -35,10 +36,16 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
         PlayerPrefs.SetInt("Level 4", 1);
         PlayerPrefs.SetInt("Level 5", 1);
         PlayerPrefs.SetInt("Level 6", 1);
-        PlayerPrefs.SetInt("Level 7", 1);
-        PlayerPrefs.SetInt("Level 8", 1);
-        PlayerPrefs.SetInt("Level 9", 1);
-        PlayerPrefs.SetInt("Level 10", 1);
+        PlayerPrefs.SetInt("Level 7", 0);
+        PlayerPrefs.SetInt("Level 8", 0);
+        PlayerPrefs.SetInt("Level 9", 0);
+        PlayerPrefs.SetInt("Level 10", 0);
+        PlayerPrefs.SetInt("Level 11", 0);
+        PlayerPrefs.SetInt("Level 12", 0);
+        PlayerPrefs.SetInt("Level 13", 0);
+        PlayerPrefs.SetInt("Level 14", 0);
+        PlayerPrefs.SetInt("Level 15", 0);
+        PlayerPrefs.SetInt("Level 16", 0);
         int i = 1;
         bool currentPicked = false;
         foreach (Transform child in page1Parent)
@@ -53,12 +60,14 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             else
             {
                 button.GetComponent<Button>().interactable = false;
+                button.transform.GetChild(1).gameObject.SetActive(true);
                 button.GetComponent<Animator>().runtimeAnimatorController = lockedLevelAnim;
             }
             if (!currentPicked && (!PlayerPrefs.HasKey($"Level {i + 1}") || PlayerPrefs.GetInt($"Level {i + 1}") != 1))
             {
                 currentPicked = true;
                 button.GetComponent<Animator>().runtimeAnimatorController = currentLevelAnim;
+                currentLevelCapacitor.transform.position = button.transform.position;
                 currentLevel = i - 1;
             }
             i++;
@@ -76,12 +85,14 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             else
             {
                 button.GetComponent<Button>().interactable = false;
+                button.transform.GetChild(1).gameObject.SetActive(true);
                 button.GetComponent<Animator>().runtimeAnimatorController = lockedLevelAnim;
             }
             if (!currentPicked && (!PlayerPrefs.HasKey($"Level {i + 1}") || PlayerPrefs.GetInt($"Level {i + 1}") != 1))
             {
                 currentPicked = true;
                 button.GetComponent<Animator>().runtimeAnimatorController = currentLevelAnim;
+                currentLevelCapacitor.transform.position = button.transform.position;
                 currentLevel = i - 1;
             }
             i++;
@@ -142,7 +153,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
         {
             button.GetComponent<RectTransform>().localScale = Vector3.one;
         }
-        buttons[currentSelection].GetComponent<RectTransform>().localScale = new Vector3(1.25f, 1.25f, 1.25f);
+        buttons[currentSelection].GetComponent<RectTransform>().localScale = new Vector3(1.125f, 1.125f, 1.125f);
     }
 
     public void Select(InputAction.CallbackContext context)
