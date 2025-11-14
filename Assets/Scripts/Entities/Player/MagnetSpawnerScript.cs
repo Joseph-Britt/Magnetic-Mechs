@@ -53,6 +53,7 @@ public class MagnetSpawnerScript : MonoBehaviour
         myMagnet.transform.Rotate(new Vector3(0, 0, 90));
         myMagnet.SetActive(true);
         Rigidbody2D magnetRB = myMagnet.GetComponent<Rigidbody2D>();
+        magnetRB.linearVelocity = Vector3.zero;
         magnetRB.AddForce(transform.right * LaunchForce, ForceMode2D.Impulse);
         //audioBox.Play();
         timer = 0;

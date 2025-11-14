@@ -12867,6 +12867,7 @@ MonoBehaviour:
   movementDisabled: 0
   verticalDirection: 0
   onGround: 0
+  overlappingGround: 0
   trulyOnGround: 0
   nearGround: 0
   groundLayer:

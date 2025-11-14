@@ -54,10 +54,10 @@ public class BossTriggerScript : MonoBehaviour
     }
     public IEnumerator SwapMusic(AudioClip loadedClip)
     {
-        audioManager.fade(3f);
-        Debug.Log("test1");
-        yield return new WaitForSeconds(5f);
-        Debug.Log("test2");
+        //audioManager.fade(3f);
+        //Debug.Log("test1");
+        yield return new WaitForSeconds(.01f);
+        //Debug.Log("test2");
         //audioManager.stopFade();
         audioSource.clip = loadedClip;
         audioSource.Play();

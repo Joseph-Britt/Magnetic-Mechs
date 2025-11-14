@@ -20,6 +20,7 @@ public class FlyingEnemy : MonoBehaviour
     public Rigidbody2D myRigidBody2D;
     public BoxCollider2D myCollider;
     public Animator animator;
+    public SpriteRenderer sprite;
     public AudioSource DeathSound;
     public DroneRespawnerScript droneRespawnerScript;
     public FlyingEnemyBulletSpawnerScript flyingEnemyBulletSpawnerScript;
@@ -41,6 +42,7 @@ public class FlyingEnemy : MonoBehaviour
         animator = GetComponent<Animator>();
         myCollider = GetComponent<BoxCollider2D>();
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        sprite = GetComponent<SpriteRenderer>();
         health = startingHealth;
         startingY = transform.position.y;
         movementEnabled = true;
@@ -48,18 +50,21 @@ public class FlyingEnemy : MonoBehaviour
         if(upperVerticalBound != null)
         {
             upperVerticalBound.localPosition = new Vector3(0f, upperVerticalBound.localPosition.y, 0f);
-
+            Debug.Log("test2");
         }
         if(lowerVerticalBound != null)
         {
             lowerVerticalBound.localPosition = new Vector3(0f, lowerVerticalBound.localPosition.y, 0f);
-
+            Debug.Log("test2");
         }
     }
 
     // Update is called once per frame
     void Update()
     {
+        //Debug.Log("Enemy: " + transform.position.y);
+        //Debug.Log("lower: " + lowerVerticalBound.position.y);
+        //Debug.Log("Upper: " + upperVerticalBound.position.y);
         if (movementEnabled)
         {
             if (transform.position.y < lowerVerticalBound.position.y) // too low
@@ -130,6 +135,16 @@ public class FlyingEnemy : MonoBehaviour
         {
             KillFlyingEnemy();
         }
+        else
+        {
+            StartCoroutine(damageFlash());
+        }
+    }
+    IEnumerator damageFlash()
+    {
+        sprite.color = Color.red;
+        yield return new WaitForSeconds(.25f);
+        sprite.color = Color.white;
     }
     void KillFlyingEnemy()
     {
