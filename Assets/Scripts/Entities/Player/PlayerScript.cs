@@ -13,8 +13,7 @@ public class PlayerScript : MonoBehaviour
     //main script for managing the player
     [Header("Components")]
     public Rigidbody2D myRigidbody2D;
-    public Animator animator;
-    public SpriteRenderer sprite;
+    public PlayerAnimationManagerScript playerAnimationManagerScript;
     public PlayerHealthScript healthScript;
     public AudioSource jumpSound;
     public CutsceneManager cutsceneManagerScript;
@@ -26,6 +25,7 @@ public class PlayerScript : MonoBehaviour
     public Image remainingFuelImage;
     public GameObject remainingFuelParent;
     public MagnetVisualEffectScript magnetVisualEffectScript;
+    public GameObject DeathAnimation;
     
     [Header("Logic")]
     private bool playerAlive = true;
@@ -59,7 +59,9 @@ public class PlayerScript : MonoBehaviour
     [Header("Collision")]
     public bool onGround = false;
     public bool trulyOnGround = false;
+    public bool nearGround = false;
     private float groundLength = .9f;
+    private float nearGroundLength = 1.25f;
     private float legLength = .78f;
     private Vector3 distanceToLeg = new Vector3(.52f, 0, 0);
     public LayerMask groundLayer;
@@ -98,8 +100,8 @@ public class PlayerScript : MonoBehaviour
     public AudioSource jetpackAudio;
 
     [Header("Jetpack Components")]
-    public GameObject jetpackLowerLeft;
-    public GameObject jetpackLowerRight;
+    public GameObject jetpackLower;
+    //public GameObject jetpackLowerRight;
     public GameObject jetpackBackwards;
     public bool jetpackBackwardsOn;
 
@@ -157,8 +159,8 @@ public class PlayerScript : MonoBehaviour
     private void Awake()
     {
         myRigidbody2D = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-        sprite = GetComponent<SpriteRenderer>();
+        //animator = GetComponent<Animator>();
+        //sprite = GetComponent<SpriteRenderer>();
         myInput = GetComponent<PlayerInput>();
         healthScript = GameObject.FindGameObjectWithTag("PlayerHealth").GetComponent<PlayerHealthScript>();
         virtualCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
@@ -202,10 +204,11 @@ public class PlayerScript : MonoBehaviour
         }
         onGround = (Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, groundLength, groundLayer));
         trulyOnGround = onGround && !(Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, legLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, legLength, groundLayer));
+        nearGround = (Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, nearGroundLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, nearGroundLength, groundLayer));
         if (playerAlive)
         {
-            animator.SetBool("OnGround", trulyOnGround);
-            animator.SetBool("LandingFast", onGround && myRigidbody2D.linearVelocity.y < -5);
+            //playerAnimationManagerScript.setLanding(trulyOnGround, onGround, myRigidbody2D.linearVelocity.y);
+            playerAnimationManagerScript.setLanding(nearGround);
         }
         //Method One Recover on Ground
         if (trulyOnGround)
@@ -275,8 +278,8 @@ public class PlayerScript : MonoBehaviour
         {
             magnetSpawnerScript.Launch();
         }
-        jetpackLowerLeft.GetComponent<JetpackScript>().setJetpack(jetpackOn);
-        jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(jetpackOn);
+        jetpackLower.GetComponent<JetpackScript>().setJetpack(jetpackOn);
+        //jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(jetpackOn);
         jetpackBackwardsOn = !trulyOnGround && Mathf.Abs(direction) > 0;
         jetpackBackwards.GetComponent<JetpackScript>().setJetpack(jetpackBackwardsOn);
         //jumpPressed = false;
@@ -294,7 +297,8 @@ public class PlayerScript : MonoBehaviour
         handleGunOrientation();
         if (!playerAlive || movementDisabled)
         {
-            animator.SetBool("hasDied", false);
+            //TODO set up dying stuff
+            //animator.SetBool("hasDied", false);
             return;
         }
         UpdatePlatformFriction();
@@ -430,7 +434,8 @@ public class PlayerScript : MonoBehaviour
     }
     void handleHorizontalMovement()
     {
-        animator.SetFloat("HorizontalInput", Mathf.Abs(direction));
+        playerAnimationManagerScript.setHorizontalSpeed(Mathf.Abs(direction));
+        //animator.SetFloat("HorizontalInput", Mathf.Abs(direction));
         horizontalSpeed = baseSpeed * direction;
         myRigidbody2D.AddForce(Vector2.right * horizontalSpeed);
         if ((horizontalSpeed > 0 && !facingRight) || (horizontalSpeed < 0 && facingRight))
@@ -494,14 +499,16 @@ public class PlayerScript : MonoBehaviour
     private void Flip()
     {
         facingRight = !facingRight;
-        transform.rotation = Quaternion.Euler(0, facingRight ? 0 : 180, 0);
+        playerAnimationManagerScript.flipLegs(facingRight);
+        //transform.rotation = Quaternion.Euler(0, facingRight ? 0 : 180, 0);
         remainingFuelImage.transform.rotation = Quaternion.Euler(0, 0, 0);
     }
     public void DisableMovement()
     {
         movementDisabled = true;
         myRigidbody2D.linearVelocity = Vector3.zero;
-        animator.SetFloat("HorizontalInput", 0);
+        playerAnimationManagerScript.setHorizontalSpeed(0);
+        //animator.SetFloat("HorizontalInput", 0);
     }
     public void EnableMovement()
     {
@@ -549,12 +556,14 @@ public class PlayerScript : MonoBehaviour
         {
             BulletSpawner.transform.right = rightJoystick;
             MagnetSpawner.transform.right = rightJoystick;
+            //playerAnimationManagerScript.setFiringAngle(Vector2.Angle(myRigidbody2D.position, mousePosition));
         }
         else
         {
             mouseRelativePosition = mousePosition - myRigidbody2D.position;
             BulletSpawner.transform.right = mouseRelativePosition;
             MagnetSpawner.transform.right = mouseRelativePosition;
+            playerAnimationManagerScript.setFiringAngle(Mathf.Atan2(mouseRelativePosition.y, mouseRelativePosition.x) * Mathf.Rad2Deg);
         }
     }
     private void modifyPhysics(bool jetpackOn)
@@ -735,10 +744,10 @@ public class PlayerScript : MonoBehaviour
     {
         //movementEnabled = false;
         myRigidbody2D.AddForce(knockbackDirection * knockback * 10, ForceMode2D.Impulse);
-        sprite.color = Color.red;
+        playerAnimationManagerScript.setAllSpritesColor(Color.red);
         yield return new WaitForSeconds(knockbackTime);
         //movementEnabled = true;
-        sprite.color = Color.white;
+        playerAnimationManagerScript.setAllSpritesColor(Color.white);
     }
     public void handleJetPackTime()
     {
@@ -796,20 +805,23 @@ public class PlayerScript : MonoBehaviour
             return;
         }
         playerAlive = false;
-        animator.SetBool("hasDied", true);
+        //TODO dying stuff
+        //animator.SetBool("hasDied", true);
+        playerAnimationManagerScript.startDeath();
+        DeathAnimation.SetActive(true);
         myRigidbody2D.linearVelocity = new Vector3(0, 0, 0);
         myRigidbody2D.gravityScale = 1.5f;
         chargeIndicator.sprite = null;
         if (magnetAudio != null && magnetAudio.isPlaying) magnetAudio.Stop();
         if (jetpackAudio != null && jetpackAudio.isPlaying) jetpackAudio.Stop();
-        jetpackLowerLeft.GetComponent<JetpackScript>().setJetpack(false);
-        jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(false);
+        jetpackLower.GetComponent<JetpackScript>().setJetpack(false);
+        //jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(false);
         jetpackBackwards.GetComponent<JetpackScript>().setJetpack(false);
         StartCoroutine(HandleDeath());
     }
     IEnumerator HandleDeath()
     {
-        yield return new WaitUntil(() => gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Dead"));
+        yield return new WaitUntil(() => DeathAnimation.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Dead"));
         gameObject.SetActive(false);
     }
     public void setMagnet(GameObject magnet)
