@@ -198,7 +198,8 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 7436248467303943683, guid: 10b04f568aba76645a715ca03f9bf683, type: 3}
     - {fileID: 2256963814519722063, guid: 10b04f568aba76645a715ca03f9bf683, type: 3}
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7560445843971578584, guid: 10b04f568aba76645a715ca03f9bf683, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 3085586658028603688, guid: 10b04f568aba76645a715ca03f9bf683, type: 3}
       insertIndex: -1
@@ -242,6 +243,7 @@ MonoBehaviour:
   startingTime: 2
   startingSpeed: 1.5
   index: 0
+  initialFaceRight: 1
   speed: 3
   facingRight: 0
   playerTransform: {fileID: 0}
@@ -268,6 +270,7 @@ MonoBehaviour:
   health: 0
   includePrompt: 0
   movementEnabled: 0
+  cam: {fileID: 0}
 --- !u!212 &3952976754914594037
 SpriteRenderer:
   m_ObjectHideFlags: 0
