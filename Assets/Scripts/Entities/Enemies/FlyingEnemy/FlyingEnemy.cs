@@ -50,21 +50,16 @@ public class FlyingEnemy : MonoBehaviour
         if(upperVerticalBound != null)
         {
             upperVerticalBound.localPosition = new Vector3(0f, upperVerticalBound.localPosition.y, 0f);
-            Debug.Log("test2");
         }
         if(lowerVerticalBound != null)
         {
             lowerVerticalBound.localPosition = new Vector3(0f, lowerVerticalBound.localPosition.y, 0f);
-            Debug.Log("test2");
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log("Enemy: " + transform.position.y);
-        //Debug.Log("lower: " + lowerVerticalBound.position.y);
-        //Debug.Log("Upper: " + upperVerticalBound.position.y);
         if (movementEnabled)
         {
             if (transform.position.y < lowerVerticalBound.position.y) // too low
