@@ -270,6 +270,7 @@ MonoBehaviour:
   health: 0
   includePrompt: 0
   movementEnabled: 0
+  WALK_SPEED: 0
   cam: {fileID: 0}
 --- !u!212 &3952976754914594037
 SpriteRenderer:
