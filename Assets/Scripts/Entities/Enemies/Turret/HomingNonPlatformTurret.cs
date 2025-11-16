@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class HomingNonPlatformTurret : Turret
 {
+    [SerializeField] private bool facingRight = true;
     private Transform player;
     void Start()
     {
@@ -9,7 +10,7 @@ public class HomingNonPlatformTurret : Turret
 
         shootingAngle = calculateShootingAngle();
 
-        SetUpTurret();
+        SetUpTurret(facingRight);
     }
 
     private void Update()
@@ -21,6 +22,6 @@ public class HomingNonPlatformTurret : Turret
     private float calculateShootingAngle()
     {
         Vector2 playerRelativePosition = (Vector2)(player.transform.position - transform.position);
-        return Mathf.Clamp(Vector2.SignedAngle(Vector2.right, playerRelativePosition), -45f, 45f);
+        return Mathf.Clamp(Vector2.SignedAngle(facingRight ? Vector2.right : Vector2.left, playerRelativePosition), -45f, 45f);
     }
 }
