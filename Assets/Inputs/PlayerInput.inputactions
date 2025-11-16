@@ -344,7 +344,7 @@
                 {
                     "name": "",
                     "id": "d1e74dd0-0832-4527-984d-d7ac61423e61",
-                    "path": "<Keyboard>/s",
+                    "path": "<Keyboard>/leftShift",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse;Gamepad",

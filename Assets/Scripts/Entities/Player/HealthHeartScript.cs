@@ -67,18 +67,15 @@ public class HealthHeartScript : MonoBehaviour
     void SetFilledHearts()
     {
         float currHealth = PlayerHealth.GetComponent<PlayerHealthScript>().currentHealth;
-        Debug.Log(currHealth);
         for (int i = 0; i < heartFills.Length -1; i++)
         {
             if (i < currHealth)
             {
                 heartFills[i].fillAmount = 1;
-                Debug.Log(i);
             }
             else
             {
                 heartFills[i].fillAmount = 0;
-                Debug.Log("it happened");
             }
         }
         if (currHealth % 1 != 0)
