@@ -1,16 +1,20 @@
+using System;
 using UnityEngine;
 
 public class HomingNonPlatformTurret : Turret
 {
-    [SerializeField] private bool facingRight = true;
     private Transform player;
+    private float baseAngle;
+
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
 
+        baseAngle = transform.rotation.eulerAngles.z;
         shootingAngle = calculateShootingAngle();
 
-        SetUpTurret(facingRight);
+        SetUpTurret();
     }
 
     private void Update()
@@ -22,6 +26,7 @@ public class HomingNonPlatformTurret : Turret
     private float calculateShootingAngle()
     {
         Vector2 playerRelativePosition = (Vector2)(player.transform.position - transform.position);
-        return Mathf.Clamp(Vector2.SignedAngle(facingRight ? Vector2.right : Vector2.left, playerRelativePosition), -45f, 45f);
+        float offsetAngle = Mathf.Clamp(Vector2.SignedAngle(new Vector2(Mathf.Cos(Mathf.Deg2Rad * baseAngle), Mathf.Sin(Mathf.Deg2Rad * baseAngle)), playerRelativePosition), -45f, 45f);
+        return baseAngle + offsetAngle;
     }
 }
