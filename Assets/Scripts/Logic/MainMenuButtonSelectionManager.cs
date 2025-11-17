@@ -27,25 +27,14 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
     public int currentSelection = 0;
     public int currentPage = 0;
     private int currentLevel = 0;
+    private int currentLevelPage;
 
     private void Awake()
     {
-        PlayerPrefs.SetInt("Level 1", 1);
-        PlayerPrefs.SetInt("Level 2", 1);
-        PlayerPrefs.SetInt("Level 3", 1);
-        PlayerPrefs.SetInt("Level 4", 1);
-        PlayerPrefs.SetInt("Level 5", 1);
-        PlayerPrefs.SetInt("Level 6", 1);
-        PlayerPrefs.SetInt("Level 7", 0);
-        PlayerPrefs.SetInt("Level 8", 0);
-        PlayerPrefs.SetInt("Level 9", 0);
-        PlayerPrefs.SetInt("Level 10", 0);
-        PlayerPrefs.SetInt("Level 11", 0);
-        PlayerPrefs.SetInt("Level 12", 0);
-        PlayerPrefs.SetInt("Level 13", 0);
-        PlayerPrefs.SetInt("Level 14", 0);
-        PlayerPrefs.SetInt("Level 15", 0);
-        PlayerPrefs.SetInt("Level 16", 0);
+        if (!PlayerPrefs.HasKey("Level 1") || PlayerPrefs.GetInt("Level 1") != 1)
+        {
+            PlayerPrefs.SetInt("Level 1", 1);
+        }
         int i = 1;
         bool currentPicked = false;
         foreach (Transform child in page1Parent)
@@ -60,7 +49,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             else
             {
                 button.GetComponent<Button>().interactable = false;
-                button.transform.GetChild(1).gameObject.SetActive(true);
+                button.transform.GetChild(0).gameObject.SetActive(true);
                 button.GetComponent<Animator>().runtimeAnimatorController = lockedLevelAnim;
             }
             if (!currentPicked && (!PlayerPrefs.HasKey($"Level {i + 1}") || PlayerPrefs.GetInt($"Level {i + 1}") != 1))
@@ -69,6 +58,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
                 button.GetComponent<Animator>().runtimeAnimatorController = currentLevelAnim;
                 currentLevelCapacitor.transform.position = button.transform.position;
                 currentLevel = i - 1;
+                currentLevelPage = 0;
             }
             i++;
         }
@@ -85,7 +75,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             else
             {
                 button.GetComponent<Button>().interactable = false;
-                button.transform.GetChild(1).gameObject.SetActive(true);
+                button.transform.GetChild(0).gameObject.SetActive(true);
                 button.GetComponent<Animator>().runtimeAnimatorController = lockedLevelAnim;
             }
             if (!currentPicked && (!PlayerPrefs.HasKey($"Level {i + 1}") || PlayerPrefs.GetInt($"Level {i + 1}") != 1))
@@ -94,10 +84,12 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
                 button.GetComponent<Animator>().runtimeAnimatorController = currentLevelAnim;
                 currentLevelCapacitor.transform.position = button.transform.position;
                 currentLevel = i - 1;
+                currentLevelPage = 1;
             }
             i++;
         }
         buttons = page1Buttons;
+        currentLevelCapacitor.SetActive(currentLevelPage == 0);
         GameObject savedVariablesObject = GameObject.FindGameObjectWithTag("MultiSceneVariables");
         SetButtonSize(currentSelection);
         page1Parent.gameObject.SetActive(true);
@@ -142,6 +134,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
                     currentSelection -= 1;                
                 }
             }
+            currentLevelCapacitor.SetActive(currentLevelPage == currentPage);
             readyToChange = Time.realtimeSinceStartup + delay;
             SetButtonSize(currentSelection);
         }
@@ -166,9 +159,11 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
 
     public void HoverButton(int hover)
     {
-        Debug.Log("hover");
-        currentSelection = hover;
-        readyToChange = Time.realtimeSinceStartup + delay;
-        SetButtonSize(currentSelection);
+        if (PlayerPrefs.HasKey($"Level {hover + (currentPage * 8) + 1}") && PlayerPrefs.GetInt($"Level {hover + (currentPage * 8) + 1}") == 1)
+        {
+            currentSelection = hover;
+            readyToChange = Time.realtimeSinceStartup + delay;
+            SetButtonSize(currentSelection);
+        }
     }
 }
