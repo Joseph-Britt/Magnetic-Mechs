@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Windows;
 
@@ -39,6 +40,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
         bool currentPicked = false;
         foreach (Transform child in page1Parent)
         {
+            if (child.gameObject.GetComponent<Button>() == null) continue;
             GameObject button = child.gameObject;
             page1Buttons.Add(button);
             if (PlayerPrefs.HasKey($"Level {i}") && PlayerPrefs.GetInt($"Level {i}") == 1)
@@ -65,6 +67,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
 
         foreach (Transform child in page2Parent)
         {
+            if (child.gameObject.GetComponent<Button>() == null) continue;
             GameObject button = child.gameObject;
             page2Buttons.Add(button);
             if (PlayerPrefs.HasKey($"Level {i}") && PlayerPrefs.GetInt($"Level {i}") == 1)
@@ -159,11 +162,33 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
 
     public void HoverButton(int hover)
     {
-        if (PlayerPrefs.HasKey($"Level {hover + (currentPage * 8) + 1}") && PlayerPrefs.GetInt($"Level {hover + (currentPage * 8) + 1}") == 1)
+        if (PlayerPrefs.HasKey($"Level {hover + (currentPage * buttons.Count) + 1}") && PlayerPrefs.GetInt($"Level {hover + (currentPage * buttons.Count) + 1}") == 1)
         {
             currentSelection = hover;
             readyToChange = Time.realtimeSinceStartup + delay;
             SetButtonSize(currentSelection);
         }
+    }
+
+    public void UnlockAllLevels()
+    {
+        PlayerPrefs.SetInt("Level 1", 1);
+        PlayerPrefs.SetInt("Level 2", 1);
+        PlayerPrefs.SetInt("Level 3", 1);
+        PlayerPrefs.SetInt("Level 4", 1);
+        PlayerPrefs.SetInt("Level 5", 1);
+        PlayerPrefs.SetInt("Level 6", 1);
+        PlayerPrefs.SetInt("Level 7", 1);
+        PlayerPrefs.SetInt("Level 8", 1);
+        PlayerPrefs.SetInt("Level 9", 1);
+        PlayerPrefs.SetInt("Level 10", 1);
+        PlayerPrefs.SetInt("Level 11", 1);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void LockAllLevels()
+    {
+        PlayerPrefs.DeleteAll();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
