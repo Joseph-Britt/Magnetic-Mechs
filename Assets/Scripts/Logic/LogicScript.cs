@@ -152,7 +152,7 @@ public class LogicScript : MonoBehaviour
     public IEnumerator StartPostSpiderBoss(float delay)
     {
         yield return new WaitForSeconds(delay);
-        StartLevelEight();
+        StartLevel("Level 8");
     }
     // public void StartPostBeeBossDelay()
     // {
