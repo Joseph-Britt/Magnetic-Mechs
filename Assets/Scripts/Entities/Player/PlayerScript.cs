@@ -13,6 +13,7 @@ public class PlayerScript : MonoBehaviour
     //main script for managing the player
     [Header("Components")]
     public Rigidbody2D myRigidbody2D;
+    public CapsuleCollider2D myCapsuleCollider2D;
     public PlayerAnimationManagerScript playerAnimationManagerScript;
     public PlayerHealthScript healthScript;
     public AudioSource jumpSound;
@@ -587,7 +588,7 @@ public class PlayerScript : MonoBehaviour
             myRigidbody2D.gravityScale = 0;
             if (MathF.Abs(direction) == 0f || changingDirection)
             {
-                myRigidbody2D.linearDamping = linearDrag;
+                myRigidbody2D.linearDamping = linearDrag * 2.5f;
                 if (changingDirection)
                 {
                     CreateDust();

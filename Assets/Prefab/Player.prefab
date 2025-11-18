@@ -13241,6 +13241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myRigidbody2D: {fileID: 0}
+  myCapsuleCollider2D: {fileID: 0}
   playerAnimationManagerScript: {fileID: 14804203553909824}
   healthScript: {fileID: 0}
   jumpSound: {fileID: 7860606459020810483}
@@ -13297,8 +13298,10 @@ MonoBehaviour:
   DashingDust: {fileID: 4166812497723045390}
   magnetAttractionAudio: {fileID: 7391205654986859350}
   magnetRepulsionAudio: {fileID: 7487317075014682717}
-  lowFrictionMaterial: {fileID: 0}
-  highFrictionMaterial: {fileID: 0}
+  runningFrictionMaterial: {fileID: 6200000, guid: 27742e516227ad5418d6f782f704767f, type: 2}
+  gradualStoppingFrictionMaterial: {fileID: 6200000, guid: 053d420f72982034bb5f9d48911d8889, type: 2}
+  lowFrictionMaterial: {fileID: 6200000, guid: 3ee494f8338fa54478a191a5997c26a9, type: 2}
+  highFrictionMaterial: {fileID: 6200000, guid: e8dde3c8cfa42fb4d8297714ed03aa18, type: 2}
   frictionLerpSpeed: 10
   inputMemoryDuration: 0.1
   lastMoveInputTime: -10
