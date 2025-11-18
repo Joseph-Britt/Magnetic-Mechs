@@ -22,6 +22,7 @@ public class WideAttackScript : BulletSpawnerParent
     private bool laserOn = false;
     public float angleBetweenShots = 10;
     public int shotsOnEachSide;
+    private bool currentlyShooting = false;
     [Header("Timing")]
     public float laserTime;
     public float shootDelay = .5f;
@@ -30,6 +31,7 @@ public class WideAttackScript : BulletSpawnerParent
     public int shotsOnEachSideStage1;
     public float laserTimeStage2 = 2.5f;
     public int shotsOnEachSideStage2;
+    private bool triggerStage2 = false;
     void Awake()
     {
         blockLaserLayers = LayerMask.GetMask("Ground", "Player");
@@ -48,6 +50,14 @@ public class WideAttackScript : BulletSpawnerParent
         shotsOnEachSide = shotsOnEachSideStage1;
     }
     public void TriggerStage2()
+    {
+        if (currentlyShooting)
+        {
+            triggerStage2 = true;
+        }
+        else ActuallyTriggerStage2();
+    }
+    private void ActuallyTriggerStage2()
     {
         laserTime = laserTimeStage2;
         shotsOnEachSide = shotsOnEachSideStage2;
@@ -91,6 +101,7 @@ public class WideAttackScript : BulletSpawnerParent
     //External functions
     public void startLaser()
     {
+        currentlyShooting = true;
         RobotSpiderQueen?.GetComponent<RobotSpiderQueenScript>().startBigAttack();
         laserOn = true;
         myLineRenderer.enabled = true;
@@ -137,5 +148,7 @@ public class WideAttackScript : BulletSpawnerParent
             //shootAngles.Add(transform.rotation.eulerAngles);
         }
         RobotSpiderQueen?.GetComponent<RobotSpiderQueenScript>().endBigAttack();
+        currentlyShooting = false;
+        if (triggerStage2) ActuallyTriggerStage2();
     }
 }

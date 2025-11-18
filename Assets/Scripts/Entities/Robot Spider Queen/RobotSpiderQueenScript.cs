@@ -201,17 +201,19 @@ public class RobotSpiderQueenScript : MonoBehaviour
         AudioClip loadedClip = Resources.Load<AudioClip>("BackgroundMusic/the_robot_spider_queen_invasion_Part3");
         if (backgroundMusic != null && loadedClip != null && audioManager != null)
         {
-            StartCoroutine(SwapMusic(loadedClip));
+            backgroundMusic.clip = loadedClip;
+            backgroundMusic.Play();
+            //StartCoroutine(SwapMusic(loadedClip));
         }
     }
-    public IEnumerator SwapMusic(AudioClip loadedClip)
-    {
-        audioManager.fade(1.25f);
-        yield return new WaitForSeconds(1.5f);
-        audioManager.stopFade();
-        backgroundMusic.clip = loadedClip;
-        backgroundMusic.Play();
-    }
+    //public IEnumerator SwapMusic(AudioClip loadedClip)
+    //{
+    //    audioManager.fade(1.25f);
+    //    yield return new WaitForSeconds(1.5f);
+    //    audioManager.stopFade();
+    //    backgroundMusic.clip = loadedClip;
+    //    backgroundMusic.Play();
+    //}
     public void ShootWideAttack()
     {
         wideAttackScript.startLaser();
