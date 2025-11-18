@@ -56,45 +56,11 @@ public class LogicScript : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public void StartLevelTwo()
+    public void StartLevel(string level)
     {
         multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 2");
-    }
-    public void StartLevelThree()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 3");
-    }
-    public void StartLevelFour()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 4");
-    }
-    public void StartLevelFive()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 5");
-    }
-    public void StartLevelSix()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 6");
-    }
-    public void StartLevelSeven()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 7");
-    }
-    public void StartLevelEight()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 8");
-    }
-    public void StartLevelNine()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 9");
+        PlayerPrefs.SetInt(level, 1);
+        SceneManager.LoadScene(level);
     }
     public void StartLevelSelect()
     {
