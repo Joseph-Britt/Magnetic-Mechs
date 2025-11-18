@@ -137,10 +137,13 @@ public class PlayerScript : MonoBehaviour
     public ParticleSystem DashingDust;
 
     [Header("Magnet")]
-    private float magnetBaseForceRepulsion = 105;
-    private float magnetBaseForceAttraction = -94;
-    private float maximumMagnetDistance = 30;
-    public AudioSource magnetAudio;
+    private float magnetDistanceMultiplyingForceRepulsion = 95;
+    private float magnetDistanceMultiplyingForceAttraction = -84;
+    private float magnetBaseForceRepulsion = 10f;
+    private float magnetBaseForceAttraction = -10f;
+    private float maximumMagnetDistance = 30;  
+    public AudioSource magnetAttractionAudio;
+    public AudioSource magnetRepulsionAudio;
 
     [Header("Platform Friction")]
     public PhysicsMaterial2D lowFrictionMaterial;
@@ -261,15 +264,23 @@ public class PlayerScript : MonoBehaviour
                 jetpackAudio.Stop();
             }
         }
-        if (magnetAudio != null)
+        if (magnetAttractionAudio != null && magnetRepulsionAudio != null)
         {
             if (repelOn ^ attractOn)
             {
-                if (!magnetAudio.isPlaying) magnetAudio.Play();
+                if (repelOn)
+                {
+                    if (!magnetRepulsionAudio.isPlaying) magnetRepulsionAudio.Play();
+                }
+                if (attractOn)
+                {
+                    if (!magnetAttractionAudio.isPlaying) magnetAttractionAudio.Play();
+                }
             }
             else
             {
-                magnetAudio.Stop();
+                magnetAttractionAudio.Stop();
+                magnetRepulsionAudio.Stop();
             }
         }
         if (shootingInput)
@@ -797,8 +808,17 @@ public class PlayerScript : MonoBehaviour
     void applyMagnetism(Vector2 forceDirection, float magnetDistance)
     {
         float forceMagnitude = 1 / (float)Math.Sqrt(magnetDistance);
-        if (attractOn) forceMagnitude *= magnetBaseForceAttraction;
-        else forceMagnitude *= magnetBaseForceRepulsion;
+        if (attractOn)
+        {
+            forceMagnitude *= magnetDistanceMultiplyingForceAttraction;
+            forceMagnitude += magnetBaseForceAttraction;
+        }
+        else
+        {
+            forceMagnitude *= magnetDistanceMultiplyingForceRepulsion;
+            forceMagnitude += magnetBaseForceRepulsion;
+        }
+        Debug.Log(forceMagnitude);
         myRigidbody2D.AddForce(forceDirection * forceMagnitude, ForceMode2D.Force);
     }
     public void KillPlayer()
@@ -815,7 +835,8 @@ public class PlayerScript : MonoBehaviour
         myRigidbody2D.linearVelocity = new Vector3(0, 0, 0);
         myRigidbody2D.gravityScale = 1.5f;
         chargeIndicator.sprite = null;
-        if (magnetAudio != null && magnetAudio.isPlaying) magnetAudio.Stop();
+        if (magnetAttractionAudio != null && magnetAttractionAudio.isPlaying) magnetAttractionAudio.Stop();
+        if (magnetRepulsionAudio != null && magnetRepulsionAudio.isPlaying) magnetRepulsionAudio.Stop();
         if (jetpackAudio != null && jetpackAudio.isPlaying) jetpackAudio.Stop();
         jetpackLower.GetComponent<JetpackScript>().setJetpack(false);
         //jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(false);

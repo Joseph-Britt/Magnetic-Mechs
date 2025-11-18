@@ -117,9 +117,6 @@ MonoBehaviour:
   MuzzlePrefab: {fileID: 625931192793893498, guid: fa3192597ace39c45a07148447780202, type: 3}
   bulletSpawnpoint: {fileID: 1010024946081967214}
   muzzleSpawnpoint: {fileID: 7915317549636319739}
-  turretHolder: {fileID: 5752900602501702395}
-  turretChamber: {fileID: 6849327950900559977}
-  baseAngle: 0
   timeBetweenShots: 4
   missileForce: 5
   facingLeft: 0
@@ -262,7 +259,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
