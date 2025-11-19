@@ -634,7 +634,7 @@ public class PlayerScript : MonoBehaviour
             // if charging cooldown is over and we aren't charging
             if (!isCharging && chargeCooldownTimer < 0f)
             {
-                chargeIndicator.sprite = chargeIndicatorImage;
+                //chargeIndicator.sprite = chargeIndicatorImage;
 
                 // start charging if we press the button
                 if (chargePressed)
