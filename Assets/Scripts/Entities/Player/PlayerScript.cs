@@ -65,8 +65,10 @@ public class PlayerScript : MonoBehaviour
     private float groundLength = .9f;
     private float nearGroundLength = 1.25f;
     private float legLength = .78f;
-    private Vector3 distanceToLeg = new Vector3(.52f, 0, 0);
+    private Vector3 distanceToLeg = new Vector3(.42f, 0, 0);
+    private Vector3 inGroundOffset = new Vector3(0, .25f,0);
     public LayerMask groundLayer;
+    public LayerMask inGroundLayer;
 
     [Header("Jumping")]
     public bool jumpPressed = false;
@@ -185,6 +187,7 @@ public class PlayerScript : MonoBehaviour
         MagnetSpawner = GameObject.FindGameObjectWithTag("MagnetSpawner");
         magnetSpawnerScript = MagnetSpawner.GetComponent<MagnetSpawnerScript>();
         groundLayer = LayerMask.GetMask("Ground","Plank Ground");
+        inGroundLayer = LayerMask.GetMask("Ground");
         jetpackCurrentTime = jetpackTotalTime;
     }
 
@@ -322,6 +325,7 @@ public class PlayerScript : MonoBehaviour
         handleMagneticRepulsion();
         handleRemainingFuelBar();
         handleCharging();
+        CheckIfStuckInGround();
     }
 
     public void OnMove(UnityEngine.InputSystem.InputAction.CallbackContext ctx) { 
@@ -819,7 +823,6 @@ public class PlayerScript : MonoBehaviour
             forceMagnitude *= magnetDistanceMultiplyingForceRepulsion;
             forceMagnitude += magnetBaseForceRepulsion;
         }
-        Debug.Log(forceMagnitude);
         myRigidbody2D.AddForce(forceDirection * forceMagnitude, ForceMode2D.Force);
     }
     public void KillPlayer()
@@ -954,6 +957,14 @@ public class PlayerScript : MonoBehaviour
         if (context.performed)
         {
             logic.SetPausePressed();
+        }
+    }
+    public void CheckIfStuckInGround()
+    {
+        bool inGround= (Physics2D.Raycast(transform.position - distanceToLeg/2 + inGroundOffset, Vector2.down, groundLength, inGroundLayer) || Physics2D.Raycast(transform.position + distanceToLeg / 2 + inGroundOffset, Vector2.down, groundLength, inGroundLayer));
+        if (inGround)
+        {
+            KillPlayer();
         }
     }
     private void OnDrawGizmos()
