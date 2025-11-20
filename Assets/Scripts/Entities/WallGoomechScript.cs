@@ -8,9 +8,9 @@ using UnityEngine.U2D;
  * This is the script for the WallGoomech prefab, a variant of goomech that crawls along walls and ceilings.
  * A few things to note:
  * They will never be deflected by walls or cliffs; they always respond to these situations by climbing the wall/cliff.
- * They will turn around on reaching another enemy
+ * They will pass through other enemies
  * They walk through spikes
- * If you give a camera to the serialized field "cam", then they will only move when visible in that camera
+ * If you give a camera to the serialized field "cam", then they will only move after they have been seen by that camera for the first time
  * If they are spawned in midair, they will fall straight down and latch onto the ground that they land on
  * Occasionally, if they are very dense in one area, they might begin to interact strangely (ex. rapid turns instead of flips). This isn't a problem unless they are closely packed.
  */
@@ -19,9 +19,11 @@ using UnityEngine.U2D;
 
 public class WallGoomechScript : GoomechScript
 {
-    // must be a factor of 90, otherwise the goomech will not reach a walkable angle (0, 90, 180, 270) once it starts turning
+    // must be a factor of 90, otherwise the goomech will not reach a walkable angle (0, 90, 180, 270) once it starts turning. Not responsive to frame rate.
     private static readonly float TURN_SPEED = 10.0f;
-    private static readonly float WALK_SPEED = 0.08f;
+    // responsive to frame rate
+    [SerializeField]
+    private static readonly float WALK_SPEED = 2.5f;
     private static readonly float CHECK_LENGTH = 0.5f;
     // the distance in front of the goomech at which to check whether to start a convex turn
     private static readonly float GROUND_IN_FRONT_CHECK_LENGTH = 0.4f;
@@ -39,6 +41,10 @@ public class WallGoomechScript : GoomechScript
     // use this in Unity editor to set which direction to face initially
     [SerializeField]
     private Camera cam;
+    // whether this goomech has been seen by cam
+    private bool hasBeenSeen = false;
+    private Vector3 prevPosition;
+    private Quaternion prevRotation;
 
 
 
@@ -55,15 +61,23 @@ public class WallGoomechScript : GoomechScript
     }
     private void Update()
     {
+        // update stored transform image
+        prevPosition = transform.position;
+        prevRotation = transform.rotation;
+
         // do nothing if dead or out of camera
-        if (!isAlive || !InCamera())
+        if (!isAlive || (!InCamera() && !hasBeenSeen))
         {
             return;
         }
 
+        // has been seen: now move when offscreen
+        hasBeenSeen = true;
+
         // edge case: starting behavior
         if (startingBehavior)
         {
+            Debug.Log("starting behavior");
             SpawnBehavior();
             return;
         }
@@ -88,6 +102,7 @@ public class WallGoomechScript : GoomechScript
         // if falling
         else
         {
+            Debug.Log("falling");
             myRigidBody2D.bodyType = RigidbodyType2D.Dynamic;
             this.movementEnabled = false;
 
@@ -101,40 +116,55 @@ public class WallGoomechScript : GoomechScript
             }
         }
 
-        // enemy or spike: turn around
-        if (approachingEnemy)
-        {
-            Flip();
-        }
-
-        if (!movementEnabled) return;
-
         // ==== movement ====
 
-        if (justFlipped)
+        if (movementEnabled)
         {
-            justFlipped = false;
-        }
-        else
-        {
-            // concave turns
-            if ((turning && turningConcave) || approachingWall)
+            if (justFlipped)
             {
+                justFlipped = false;
+            }
+            else
+            {
+                // concave turns
+                if ((turning && turningConcave) || approachingWall)
+                {
+                    Turn(true);
+                }
+
+                // turn convex
+                else if ((turning && !turningConcave) || !groundInFront)
+                {
+                    Turn(false);
+                }
+            }
+
+            // walk
+            if ((!turning && groundInFront) || (turning && !turningConcave))
+            {
+                Walk();
+            }        
+        }
+
+        
+        // if frozen
+
+        // no, the == operator doesn't check reference equality here; it's overridden to allow for floating-point weirdness, making it better than .Equals() 
+        if (transform.position == prevPosition && transform.rotation == prevRotation)
+        {
+            Debug.Log("discovered I was frozen");
+            if (!approachingWall)
+            {
+                Walk();
+            }
+            else
+            {
+                turning = true; 
+                turningConcave = true;
                 Turn(true);
             }
-
-            // turn convex
-            else if ((turning && !turningConcave) || !groundInFront)
-            {
-                Turn(false);
-            }
         }
 
-        // walk
-        if ((!turning && groundInFront) || (turning && !turningConcave))
-        {
-            Walk();
-        }
     }
 
     private void Walk()
@@ -148,7 +178,7 @@ public class WallGoomechScript : GoomechScript
         {
             myRigidBody2D.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         }
-        myRigidBody2D.transform.position += facingDirection * (turning ? TURN_WALK_SPEED : WALK_SPEED);
+        myRigidBody2D.transform.position += facingDirection * (turning ? TURN_WALK_SPEED : (WALK_SPEED * Time.deltaTime));
     }
 
     private void Turn(bool concave)
@@ -183,7 +213,9 @@ public class WallGoomechScript : GoomechScript
     {
         if (cam == null) return true;
         Vector3 pos = cam.WorldToViewportPoint(transform.position);
-        return pos.x >= 0 && pos.x <= 1 && pos.y >= 0 && pos.y <= 1;
+        bool returnVal = pos.x >= 0 && pos.x <= 1 && pos.y >= 0 && pos.y <= 1;
+        Debug.Log($"InCamera returned {returnVal}");
+        return returnVal;
     }
 
     new public void Flip()

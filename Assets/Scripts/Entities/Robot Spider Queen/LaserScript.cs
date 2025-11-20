@@ -28,6 +28,7 @@ public class LaserScript : MonoBehaviour
     private float defaultDamage = .25f;
     private float defaultInvincibleTime = .1f;
     public bool laserEnabled = false;
+    private bool triggerStage2 = false;
     [Header("Explosion")]
     public float explosionTime = .2f;
     private float explosionTimer;
@@ -86,6 +87,17 @@ public class LaserScript : MonoBehaviour
         goThroughDegrees = goThroughDegreesStage1;
     }
     public void TriggerStage2()
+    {
+        if (laserEnabled)
+        {
+            triggerStage2 = true;
+        }
+        else
+        {
+            ActuallyTriggerStage2();
+        }
+    }
+    public void ActuallyTriggerStage2()
     {
         rotationSpeed = rotationSpeedStage2;
         laserPointerTime = laserPointerTimeStage2;
@@ -225,6 +237,10 @@ public class LaserScript : MonoBehaviour
         //robotSpiderQueenScript.endBigAttack();
         robotSpiderQueenScript.endLaserAttack();
         disableLaserRenderer();
+        if (triggerStage2)
+        {
+            ActuallyTriggerStage2();
+        }
     }
     void enableLaserRenderer()
     {
