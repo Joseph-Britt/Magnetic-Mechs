@@ -6,22 +6,26 @@ using UnityEngine.InputSystem;
 public class InputRebinding : MonoBehaviour {
 
     private const string PLAYER_PREFS_BINDING_OVERRIDES = "Binding Overrides";
-    
+    private const string PLAYER_PREFS_HOLD_TO_ATTRACT = "Hold to Attract";
+
     public static InputRebinding Instance { get; private set; }
 
     public event EventHandler OnInputRebindingStarted;
     public event EventHandler OnInputRebindingCompleted;
+    public event EventHandler OnHoldToAttractChanged;
 
     [SerializeField] private PlayerInput playerInput;
 
     [Header("Input Actions")]
-    [SerializeField] string moveInputActionString = "Move";
-    [SerializeField] string jumpInputActionString = "Jump";
-    [SerializeField] string fireInputActionString = "Fire";
-    [SerializeField] string launchMagnetInputActionString = "LaunchMagnet";
-    [SerializeField] string attractInputActionString = "Attract";
-    [SerializeField] string repelInputActionString = "Repel";
-    [SerializeField] string chargeInputActionString = "Charge";
+    [SerializeField] private string moveInputActionString = "Move";
+    [SerializeField] private string jumpInputActionString = "Jump";
+    [SerializeField] private string fireInputActionString = "Fire";
+    [SerializeField] private string launchMagnetInputActionString = "LaunchMagnet";
+    [SerializeField] private string attractInputActionString = "Attract";
+    [SerializeField] private string repelInputActionString = "Repel";
+    [SerializeField] private string chargeInputActionString = "Charge";
+
+    private bool holdToAttract = false;
 
     public enum Binding {
         MOVE_UP,
@@ -50,6 +54,9 @@ public class InputRebinding : MonoBehaviour {
         if (PlayerPrefs.HasKey(PLAYER_PREFS_BINDING_OVERRIDES)) {
             string overridesJson = PlayerPrefs.GetString(PLAYER_PREFS_BINDING_OVERRIDES);
             playerInput.actions.LoadBindingOverridesFromJson(overridesJson);
+        }
+        if (PlayerPrefs.HasKey(PLAYER_PREFS_HOLD_TO_ATTRACT)) {
+            SetHoldToAttract(PlayerPrefs.GetInt(PLAYER_PREFS_HOLD_TO_ATTRACT) != 0);
         }
     }
 
@@ -115,6 +122,10 @@ public class InputRebinding : MonoBehaviour {
 
         PlayerPrefs.SetString(PLAYER_PREFS_BINDING_OVERRIDES, playerInput.actions.SaveBindingOverridesAsJson());
         OnInputRebindingCompleted?.Invoke(this, EventArgs.Empty);
+
+        SetHoldToAttract(false);
+        PlayerPrefs.SetInt(PLAYER_PREFS_HOLD_TO_ATTRACT, holdToAttract ? 1 : 0);
+        OnHoldToAttractChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public string GetBinding(Binding binding) {
@@ -141,5 +152,15 @@ public class InputRebinding : MonoBehaviour {
             case Binding.CHARGE:
                 return playerInput.actions.FindAction(chargeInputActionString).bindings[0].ToDisplayString();
         }
+    }
+
+    public void SetHoldToAttract(bool holdToAttract) {
+        this.holdToAttract = holdToAttract;
+        PlayerPrefs.SetInt(PLAYER_PREFS_HOLD_TO_ATTRACT, holdToAttract ? 1 : 0);
+        OnHoldToAttractChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public bool GetHoldToAttract() {
+        return holdToAttract;
     }
 }
