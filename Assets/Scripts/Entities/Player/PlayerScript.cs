@@ -92,7 +92,7 @@ public class PlayerScript : MonoBehaviour
     public SpriteRenderer chargeIndicator;
 
     [Header("Jetpack")]
-    private float jetpackTotalTime = 1.4f;
+    private float jetpackTotalTime = 1.2f;
     public float jetpackCurrentTime = 0f;
     private float jetPackForce = 12f;
     private float maxJetSpeed = 19f;
@@ -143,10 +143,10 @@ public class PlayerScript : MonoBehaviour
     public ParticleSystem DashingDust;
 
     [Header("Magnet")]
-    private float magnetDistanceMultiplyingForceRepulsion = 95;
-    private float magnetDistanceMultiplyingForceAttraction = -84;
-    private float magnetBaseForceRepulsion = 10f;
-    private float magnetBaseForceAttraction = -10f;
+    private float magnetDistanceMultiplyingForceRepulsion = 98;
+    private float magnetDistanceMultiplyingForceAttraction = -87;
+    private float magnetBaseForceRepulsion = 7f;
+    private float magnetBaseForceAttraction = -7f;
     private float maximumMagnetDistance = 30;  
     public AudioSource magnetAttractionAudio;
     public AudioSource magnetRepulsionAudio;
