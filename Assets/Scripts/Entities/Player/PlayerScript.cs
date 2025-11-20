@@ -114,7 +114,9 @@ public class PlayerScript : MonoBehaviour
     public float gravity = 1f;
     private float fallMultiplier = 3f;
     public bool repelOn = false;
+    public bool attractButtonHeld = false;
     public bool attractOn = false;
+    public bool holdToAttract = false;
 
     [Header("Orientation")]
     public Camera virtualCamera;
@@ -130,6 +132,7 @@ public class PlayerScript : MonoBehaviour
     [Header("Magnet")]
     public GameObject MagnetSpawner;
     public MagnetSpawnerScript magnetSpawnerScript;
+    private bool launchMagnetHeld = false;
     private bool launchMagnet = false;
     private GameObject myMagnet;
     private Vector2 magnetRelativePosition;
@@ -191,9 +194,23 @@ public class PlayerScript : MonoBehaviour
         jetpackCurrentTime = jetpackTotalTime;
     }
 
+    private void Start() {
+        holdToAttract = InputRebinding.Instance.GetHoldToAttract();
+        InputRebinding.Instance.OnHoldToAttractChanged += InputRebinding_OnHoldToAttractChanged;
+    }
+
+    private void OnDestroy() {
+        InputRebinding.Instance.OnHoldToAttractChanged -= InputRebinding_OnHoldToAttractChanged;
+    }
+
+    private void InputRebinding_OnHoldToAttractChanged(object sender, EventArgs e) {
+        holdToAttract = InputRebinding.Instance.GetHoldToAttract();
+    }
+
     // Update is called once per frame
     void Update()
     {
+        attractOn = attractButtonHeld || (holdToAttract && launchMagnetHeld);
         if (!playerAlive || logic.IsPaused)
         {
             return;
@@ -294,6 +311,7 @@ public class PlayerScript : MonoBehaviour
         if (launchMagnet)
         {
             magnetSpawnerScript.Launch();
+            launchMagnet = false;
         }
         jetpackLower.GetComponent<JetpackScript>().setJetpack(jetpackOn);
         //jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(jetpackOn);
@@ -362,7 +380,7 @@ public class PlayerScript : MonoBehaviour
            
             lastAttractInputTime = Time.time;
         }
-        attractOn = ctx.ReadValueAsButton();
+        attractButtonHeld = ctx.ReadValueAsButton();
     }
     private bool HasRecentInput()
     {
@@ -917,10 +935,12 @@ public class PlayerScript : MonoBehaviour
     {
         if (context.performed)
         {
+            launchMagnetHeld = true;
             launchMagnet = true;
         }
         if (context.canceled)
         {
+            launchMagnetHeld = false;
             launchMagnet = false;
         }
     }
@@ -942,11 +962,11 @@ public class PlayerScript : MonoBehaviour
     {
         if (context.performed)
         {
-            attractOn = true;
+            attractButtonHeld = true;
         }
         if (context.canceled)
         {
-            attractOn = false;
+            attractButtonHeld = false;
         }
         if (context.performed && myMagnet != null){
             lastAttractInputTime= Time.time;
