@@ -1269,7 +1269,7 @@ Transform:
   m_GameObject: {fileID: 339494811}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 80.69, y: 51.43, z: 0.16129729}
+  m_LocalPosition: {x: 83.14, y: 51.43, z: 0.16129729}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1288,7 +1288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelToLoad: Level 4
-  timeToWait: 1.5
+  timeToWait: 0.5
 --- !u!4 &384848075 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8625475655797674624, guid: 3cdd95d7e7ef1014384613e394591fd9, type: 3}
@@ -51537,7 +51537,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448269637526337376, guid: c194fb5bcb4d746479e68141f3dcc935, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.6
+      value: -2.75
       objectReference: {fileID: 0}
     - target: {fileID: 1448269637526337376, guid: c194fb5bcb4d746479e68141f3dcc935, type: 3}
       propertyPath: m_LocalPosition.z
@@ -53243,7 +53243,7 @@ Transform:
   m_GameObject: {fileID: 1265375395}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.516798, y: 7.31743, z: -10}
+  m_LocalPosition: {x: 10.502646, y: 7.31743, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -53346,17 +53346,19 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -17.942406, y: 38.6}
-      - {x: -19.7, y: 38.6}
+    - - {x: -11.733512, y: 38.6}
+      - {x: -11.750493, y: -1.3883133}
+      - {x: -19.74583, y: -1.3789806}
       - {x: -19.7, y: -31.3}
       - {x: 46.2, y: -31.3}
-      - {x: 55.2, y: -31.391834}
-      - {x: 61.343723, y: -31.032799}
-      - {x: 60.845543, y: -19.364693}
-      - {x: 61.152214, y: -18.60171}
-      - {x: 60.697906, y: -18.362223}
+      - {x: 61.1851, y: -31.270725}
+      - {x: 61.2268, y: -18.361382}
       - {x: 149.1172, y: -18.355158}
-      - {x: 149.40953, y: 39.77926}
+      - {x: 149.2146, y: 27.625406}
+      - {x: 137.29578, y: 27.541761}
+      - {x: 137.1679, y: 31.693417}
+      - {x: 149.1789, y: 31.722895}
+      - {x: 149.00914, y: 39.52848}
       - {x: 83.30576, y: 39.62858}
       - {x: 83.26591, y: 38.600838}
       - {x: 55.2, y: 38.6}

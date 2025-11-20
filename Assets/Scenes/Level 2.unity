@@ -87341,7 +87341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelToLoad: Level 3
-  timeToWait: 1.5
+  timeToWait: 0.25
 --- !u!61 &1899237413
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -87468,9 +87468,9 @@ PolygonCollider2D:
     m_Paths:
     - - {x: -20.517086, y: 52.82959}
       - {x: -20.70492, y: -5.496809}
-      - {x: -26.690321, y: -5.4959736}
-      - {x: -26.86622, y: -49.238453}
-      - {x: 132.38739, y: -49.371647}
+      - {x: -26.718, y: -5.468294}
+      - {x: -26.767225, y: -49.364143}
+      - {x: 132.22638, y: -49.36218}
       - {x: 131.82599, y: 52.309776}
   m_UseDelaunayMesh: 0
 --- !u!4 &1932226406
