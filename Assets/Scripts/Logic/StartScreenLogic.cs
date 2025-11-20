@@ -12,68 +12,78 @@ public class StartScreenLogic : MonoBehaviour
     public MultiSceneVariables variableStorage;
     public PlayerInput myInput;
     public PlayerInput selectionInput;
-    public MainMenuButtonSelectionManager mainMenuButtonSelectionManager;
-    public StartMenuButtonSelectionManager startMenuButtonSelectionManager;
-    private bool onStart = true;
 
     private void Awake()
     {
         myInput = GetComponent<PlayerInput>();
-        myInput.SwitchCurrentActionMap("UI");
         variableStorage = GameObject.FindGameObjectWithTag("MultiSceneVariables").GetComponent<MultiSceneVariables>();
     }
     public void StartGame()
     {
-        onStart = false;
-        startMenuButtonSelectionManager.stopEnabling();
         startScreenStart.SetActive(false);
         startScreenLevelSelect.SetActive(true);
     }
-
-    public void StartStage(string level)
+    public void StartStage1()
     {
         variableStorage.setCheckpoint(0);
-        SceneManager.LoadScene(level);
+        SceneManager.LoadScene("Level 1");
     }
-    //public void GamePadPressed(InputAction.CallbackContext context)
-    //{
-    //    if (context.performed)
-    //    {
-    //        variableStorage.gamePadNotMouse = true;
-    //        myInput.SwitchCurrentActionMap("UI");
-    //        StartGame();
-    //    }
-    //}
-    public void StartGame(InputAction.CallbackContext context)
+    public void StartStage2()
+    {
+        variableStorage.setCheckpoint(0);
+        SceneManager.LoadScene("Level 2");
+    }
+    public void StartStage3()
+    {
+        variableStorage.setCheckpoint(0);
+        SceneManager.LoadScene("Level 3");
+    }
+    public void StartStage4()
+    {
+        variableStorage.setCheckpoint(0);
+        SceneManager.LoadScene("Level 4");
+    }
+    public void StartStage5()
+    {
+        variableStorage.setCheckpoint(0);
+        SceneManager.LoadScene("Level 5");
+    }
+    public void StartStage6()
+    {
+        variableStorage.setCheckpoint(0);
+        SceneManager.LoadScene("Level 6");
+    }
+    public void StartStage7()
+    {
+        variableStorage.setCheckpoint(0);
+        SceneManager.LoadScene("Level 7");
+    }
+    public void StartStage8()
+    {
+        variableStorage.setCheckpoint(0);
+        SceneManager.LoadScene("Level 8");
+    }
+    public void StartStage9()
+    {
+        variableStorage.setCheckpoint(0);
+        SceneManager.LoadScene("Level 9");
+    }
+    public void GamePadPressed(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            variableStorage.gamePadNotMouse = true;
+            myInput.SwitchCurrentActionMap("UI");
+            StartGame();
+        }
+    }
+    public void SpacePressed(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
             variableStorage.gamePadNotMouse = false;
             myInput.SwitchCurrentActionMap("UI");
             StartGame();
-        }
-    }
-    public void Move(InputAction.CallbackContext context)
-    {
-        Debug.Log("test");
-        if (onStart)
-        {
-            startMenuButtonSelectionManager.Move(context);
-        }
-        else
-        {
-            mainMenuButtonSelectionManager.Move(context);
-        }
-    }
-    public void Select(InputAction.CallbackContext context)
-    {
-        if (onStart)
-        {
-            startMenuButtonSelectionManager.Select(context);
-        }
-        else
-        {
-            mainMenuButtonSelectionManager.Select(context);
         }
     }
 }

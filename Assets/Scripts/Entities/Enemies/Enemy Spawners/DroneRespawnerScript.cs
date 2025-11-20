@@ -24,7 +24,7 @@ public class DroneRespawnerScript : MonoBehaviour
     public Transform maxYPosition;
     private void Start()
     {
-        timeToSpawn = 6.5f;
+        timeToSpawn = 5;
         timer = timeToSpawn;
         myTransform = transform;
         SetUpArrays();
@@ -88,6 +88,6 @@ public class DroneRespawnerScript : MonoBehaviour
     public void ActivatePhase2()
     {
         DronesAvailableQueue.Enqueue(1);
-        timeToSpawn = 5.5f;
+        timeToSpawn = 4.5f;
     }
 }

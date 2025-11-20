@@ -86486,7 +86486,7 @@ GameObject:
   - component: {fileID: 1285581326}
   - component: {fileID: 1285581328}
   m_Layer: 0
-  m_Name: Start Level 6
+  m_Name: Return to Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87341,7 +87341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelToLoad: Level 3
-  timeToWait: 0.25
+  timeToWait: 1.5
 --- !u!61 &1899237413
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -87468,9 +87468,9 @@ PolygonCollider2D:
     m_Paths:
     - - {x: -20.517086, y: 52.82959}
       - {x: -20.70492, y: -5.496809}
-      - {x: -26.718, y: -5.468294}
-      - {x: -26.767225, y: -49.364143}
-      - {x: 132.22638, y: -49.36218}
+      - {x: -26.690321, y: -5.4959736}
+      - {x: -26.86622, y: -49.238453}
+      - {x: 132.38739, y: -49.371647}
       - {x: 131.82599, y: 52.309776}
   m_UseDelaunayMesh: 0
 --- !u!4 &1932226406
@@ -106618,7 +106618,7 @@ Transform:
   m_GameObject: {fileID: 1973955186}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.4720056, y: -0.0012299999, z: -10}
+  m_LocalPosition: {x: 3.430533, y: -0.0043599997, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

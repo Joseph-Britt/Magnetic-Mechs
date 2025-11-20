@@ -13,7 +13,6 @@ public class PlayerScript : MonoBehaviour
     //main script for managing the player
     [Header("Components")]
     public Rigidbody2D myRigidbody2D;
-    public CapsuleCollider2D myCapsuleCollider2D;
     public PlayerAnimationManagerScript playerAnimationManagerScript;
     public PlayerHealthScript healthScript;
     public AudioSource jumpSound;
@@ -65,10 +64,8 @@ public class PlayerScript : MonoBehaviour
     private float groundLength = .9f;
     private float nearGroundLength = 1.25f;
     private float legLength = .78f;
-    private Vector3 distanceToLeg = new Vector3(.42f, 0, 0);
-    private Vector3 inGroundOffset = new Vector3(0, .25f,0);
+    private Vector3 distanceToLeg = new Vector3(.52f, 0, 0);
     public LayerMask groundLayer;
-    public LayerMask inGroundLayer;
 
     [Header("Jumping")]
     public bool jumpPressed = false;
@@ -92,7 +89,7 @@ public class PlayerScript : MonoBehaviour
     public SpriteRenderer chargeIndicator;
 
     [Header("Jetpack")]
-    private float jetpackTotalTime = 1.2f;
+    private float jetpackTotalTime = 1.4f;
     public float jetpackCurrentTime = 0f;
     private float jetPackForce = 12f;
     private float maxJetSpeed = 19f;
@@ -140,13 +137,10 @@ public class PlayerScript : MonoBehaviour
     public ParticleSystem DashingDust;
 
     [Header("Magnet")]
-    private float magnetDistanceMultiplyingForceRepulsion = 98;
-    private float magnetDistanceMultiplyingForceAttraction = -87;
-    private float magnetBaseForceRepulsion = 7f;
-    private float magnetBaseForceAttraction = -7f;
-    private float maximumMagnetDistance = 30;  
-    public AudioSource magnetAttractionAudio;
-    public AudioSource magnetRepulsionAudio;
+    private float magnetBaseForceRepulsion = 105;
+    private float magnetBaseForceAttraction = -94;
+    private float maximumMagnetDistance = 30;
+    public AudioSource magnetAudio;
 
     [Header("Platform Friction")]
     public PhysicsMaterial2D lowFrictionMaterial;
@@ -187,7 +181,6 @@ public class PlayerScript : MonoBehaviour
         MagnetSpawner = GameObject.FindGameObjectWithTag("MagnetSpawner");
         magnetSpawnerScript = MagnetSpawner.GetComponent<MagnetSpawnerScript>();
         groundLayer = LayerMask.GetMask("Ground","Plank Ground");
-        inGroundLayer = LayerMask.GetMask("Ground");
         jetpackCurrentTime = jetpackTotalTime;
     }
 
@@ -268,23 +261,15 @@ public class PlayerScript : MonoBehaviour
                 jetpackAudio.Stop();
             }
         }
-        if (magnetAttractionAudio != null && magnetRepulsionAudio != null)
+        if (magnetAudio != null)
         {
             if (repelOn ^ attractOn)
             {
-                if (repelOn)
-                {
-                    if (!magnetRepulsionAudio.isPlaying) magnetRepulsionAudio.Play();
-                }
-                if (attractOn)
-                {
-                    if (!magnetAttractionAudio.isPlaying) magnetAttractionAudio.Play();
-                }
+                if (!magnetAudio.isPlaying) magnetAudio.Play();
             }
             else
             {
-                magnetAttractionAudio.Stop();
-                magnetRepulsionAudio.Stop();
+                magnetAudio.Stop();
             }
         }
         if (shootingInput)
@@ -325,7 +310,6 @@ public class PlayerScript : MonoBehaviour
         handleMagneticRepulsion();
         handleRemainingFuelBar();
         handleCharging();
-        CheckIfStuckInGround();
     }
 
     public void OnMove(UnityEngine.InputSystem.InputAction.CallbackContext ctx) { 
@@ -592,7 +576,7 @@ public class PlayerScript : MonoBehaviour
             myRigidbody2D.gravityScale = 0;
             if (MathF.Abs(direction) == 0f || changingDirection)
             {
-                myRigidbody2D.linearDamping = linearDrag * 2.5f;
+                myRigidbody2D.linearDamping = linearDrag;
                 if (changingDirection)
                 {
                     CreateDust();
@@ -638,7 +622,7 @@ public class PlayerScript : MonoBehaviour
             // if charging cooldown is over and we aren't charging
             if (!isCharging && chargeCooldownTimer < 0f)
             {
-                //chargeIndicator.sprite = chargeIndicatorImage;
+                chargeIndicator.sprite = chargeIndicatorImage;
 
                 // start charging if we press the button
                 if (chargePressed)
@@ -813,16 +797,8 @@ public class PlayerScript : MonoBehaviour
     void applyMagnetism(Vector2 forceDirection, float magnetDistance)
     {
         float forceMagnitude = 1 / (float)Math.Sqrt(magnetDistance);
-        if (attractOn)
-        {
-            forceMagnitude *= magnetDistanceMultiplyingForceAttraction;
-            forceMagnitude += magnetBaseForceAttraction;
-        }
-        else
-        {
-            forceMagnitude *= magnetDistanceMultiplyingForceRepulsion;
-            forceMagnitude += magnetBaseForceRepulsion;
-        }
+        if (attractOn) forceMagnitude *= magnetBaseForceAttraction;
+        else forceMagnitude *= magnetBaseForceRepulsion;
         myRigidbody2D.AddForce(forceDirection * forceMagnitude, ForceMode2D.Force);
     }
     public void KillPlayer()
@@ -839,8 +815,7 @@ public class PlayerScript : MonoBehaviour
         myRigidbody2D.linearVelocity = new Vector3(0, 0, 0);
         myRigidbody2D.gravityScale = 1.5f;
         chargeIndicator.sprite = null;
-        if (magnetAttractionAudio != null && magnetAttractionAudio.isPlaying) magnetAttractionAudio.Stop();
-        if (magnetRepulsionAudio != null && magnetRepulsionAudio.isPlaying) magnetRepulsionAudio.Stop();
+        if (magnetAudio != null && magnetAudio.isPlaying) magnetAudio.Stop();
         if (jetpackAudio != null && jetpackAudio.isPlaying) jetpackAudio.Stop();
         jetpackLower.GetComponent<JetpackScript>().setJetpack(false);
         //jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(false);
@@ -957,14 +932,6 @@ public class PlayerScript : MonoBehaviour
         if (context.performed)
         {
             logic.SetPausePressed();
-        }
-    }
-    public void CheckIfStuckInGround()
-    {
-        bool inGround= (Physics2D.Raycast(transform.position - distanceToLeg/2 + inGroundOffset, Vector2.down, groundLength, inGroundLayer) || Physics2D.Raycast(transform.position + distanceToLeg / 2 + inGroundOffset, Vector2.down, groundLength, inGroundLayer));
-        if (inGround)
-        {
-            KillPlayer();
         }
     }
     private void OnDrawGizmos()

@@ -9,10 +9,8 @@ public class StartNextLevel : MonoBehaviour
     public float timeToWait = 1.5f;
     [Header("Components")]
     private MultiSceneVariables multiSceneVariables;
-    private LogicScript logic;
     private void Awake()
     {
-        logic = GameObject.FindGameObjectWithTag("Logic").GetComponent<LogicScript>();
         multiSceneVariables = GameObject.FindGameObjectWithTag("MultiSceneVariables").GetComponent<MultiSceneVariables>();
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -23,6 +21,6 @@ public class StartNextLevel : MonoBehaviour
     {
         if (multiSceneVariables != null) multiSceneVariables.setCheckpoint(0);
         yield return new WaitForSeconds(timeToWait);
-        logic.StartLevel(levelToLoad);
+        SceneManager.LoadScene(levelToLoad);
     }
 }

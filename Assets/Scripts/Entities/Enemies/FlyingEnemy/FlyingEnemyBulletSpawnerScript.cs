@@ -38,7 +38,6 @@ public class FlyingEnemyBulletSpawnerScript : BulletSpawnerParent
     }
     public void EnemyUnkilled()
     {
-        shootingCounter = shootingTime;
         isAlive = true;
     }
     public void EnemyKilled()

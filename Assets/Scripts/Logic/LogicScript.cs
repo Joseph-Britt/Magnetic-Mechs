@@ -56,11 +56,45 @@ public class LogicScript : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public void StartLevel(string level)
+    public void StartLevelTwo()
     {
         multiSceneVariables.setCheckpoint(0);
-        PlayerPrefs.SetInt(level, 1);
-        SceneManager.LoadScene(level);
+        SceneManager.LoadScene("Level 2");
+    }
+    public void StartLevelThree()
+    {
+        multiSceneVariables.setCheckpoint(0);
+        SceneManager.LoadScene("Level 3");
+    }
+    public void StartLevelFour()
+    {
+        multiSceneVariables.setCheckpoint(0);
+        SceneManager.LoadScene("Level 4");
+    }
+    public void StartLevelFive()
+    {
+        multiSceneVariables.setCheckpoint(0);
+        SceneManager.LoadScene("Level 5");
+    }
+    public void StartLevelSix()
+    {
+        multiSceneVariables.setCheckpoint(0);
+        SceneManager.LoadScene("Level 6");
+    }
+    public void StartLevelSeven()
+    {
+        multiSceneVariables.setCheckpoint(0);
+        SceneManager.LoadScene("Level 7");
+    }
+    public void StartLevelEight()
+    {
+        multiSceneVariables.setCheckpoint(0);
+        SceneManager.LoadScene("Level 8");
+    }
+    public void StartLevelNine()
+    {
+        multiSceneVariables.setCheckpoint(0);
+        SceneManager.LoadScene("Level 9");
     }
     public void StartLevelSelect()
     {
@@ -147,12 +181,12 @@ public class LogicScript : MonoBehaviour
     }
     public void StartPostSpiderBossDelay()
     {
-        StartCoroutine(StartPostSpiderBoss(2f));
+        StartCoroutine(StartPostSpiderBoss(3f));
     }
     public IEnumerator StartPostSpiderBoss(float delay)
     {
         yield return new WaitForSeconds(delay);
-        StartLevel("Level 8");
+        StartLevelFive();
     }
     // public void StartPostBeeBossDelay()
     // {
