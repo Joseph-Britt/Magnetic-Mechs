@@ -15,6 +15,8 @@ public class TutorialAllPrompts : MonoBehaviour
     private Prompt jumpPrompt;
     private Prompt afterJumpPrompt;
     private Prompt magnetPrompt;
+    private Prompt magnetRepelPrompt;
+    private Prompt magnetAttractPrompt;
     private Prompt dropPrompt;
     private Prompt killPilotPrompt;
     [Header("Prompt Input Strings")]
@@ -23,14 +25,18 @@ public class TutorialAllPrompts : MonoBehaviour
     private string jumpString = "Jump";
     private string afterJumpString = "After Jump";
     private string magnetString = "Magnet";
+    private string magnetAttractString = "Attract";
+    private string magnetRepelString = "Repel";
     private string dropString = "Drop";
     private string killPilotString = "Kill";
     [Header("Prompt Output Strings keyboard")]
-    private string moveRightK = "Use \"A\" and \"D\" to move left and right";
-    private string shootingK = "Hold the Left Mouse Button To Shoot";
-    private string jumpingK = "Press Space to Jump. Hold Space Mid-air to Use Jetpack";
-    private string afterJumpKG = "Your Jetpack Will Refill Immediately on the Ground and Slowly Mid-air After Not Using it for Long Enough";
-    private string magnetingK = "Right Click to Shoot Magnet. Hold \"S\" to Repel and \"W\" to Attract";
+    private string moveRightK = "Press \"A\" and \"D\" to move left and right";
+    private string shootingK = "Hold “Left Mouse” to Shoot";
+    private string jumpingK = "Press Space to Jump. Hold Space while mid-air to Use Jetpack";
+    private string afterJumpKG = "Your Jetpack will Refill immediately on the Ground, but slowly while mid-air";
+    private string magnetingK = "Right Mouse to Shoot Magnet. Hold \"Left Shift/w\" to Repel/Attract";
+    private string magnetingRepel = "Hold \"Left Shift\" to Repel";
+    private string magnetingAttract = "Hold \"w\" to Attract. Red X Blocks will destroy the magnet if they touch it";
     private string dropK = "Hold \"S\" To Drop Through Wooden Floors";
     private string killingPilotK= "Hold \"G\" + \"L\"";
     [Header("Prompt Output Strings gamePad")]
@@ -59,6 +65,8 @@ public class TutorialAllPrompts : MonoBehaviour
             { shootString, 7 },
             { jumpString, 5 },
             { magnetString, 6 },
+            { magnetRepelString, 8 },
+            { magnetAttractString, 9 },
             { dropString, 4 },
             {afterJumpString, 3 },
             { killPilotString, 10 }
@@ -102,6 +110,22 @@ public class TutorialAllPrompts : MonoBehaviour
         priorityOrder[magnetString]
         );
         prompts.Add(magnetString, magnetPrompt);
+
+        //magnet repel prompt
+        magnetRepelPrompt = gameObject.AddComponent<Prompt>();
+        magnetRepelPrompt.postHocConstructor(
+        (gamePadNotMouse ? magnetingG : magnetingRepel),
+        priorityOrder[magnetRepelString]
+        );
+        prompts.Add(magnetRepelString, magnetRepelPrompt);
+
+        //magnet attract prompt
+        magnetAttractPrompt = gameObject.AddComponent<Prompt>();
+        magnetAttractPrompt.postHocConstructor(
+        (gamePadNotMouse ? magnetingG : magnetingAttract),
+        priorityOrder[magnetAttractString]
+        );
+        prompts.Add(magnetAttractString, magnetAttractPrompt);
 
         //drop prompt
         dropPrompt = gameObject.AddComponent<Prompt>();
