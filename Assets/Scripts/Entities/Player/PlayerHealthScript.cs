@@ -54,13 +54,13 @@ public class PlayerHealthScript : MonoBehaviour
         currentHealth -= Damage;
         if (currentHealth <= 0)
         {
-            currentHealth = 0;
             HandlePlayerDeath();
         }
         HealthSystem.GetComponent<HealthHeartScript>().UpdateHeartsHUD();
     }
     public void HandlePlayerDeath()
     {
+        currentHealth = 0;
         playerScript.KillPlayer();
         Logic.GameOver();
     }
