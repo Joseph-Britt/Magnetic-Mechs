@@ -7,7 +7,7 @@ public class TutorialAllEvents : MonoBehaviour
 {
     //Holds the scripts for the events which play out in cutscenes during the tutorial level
     [Header("Components")]
-    private Text title;
+    public GameObject title;
     public Queue<CivilianScript> civilianScripts;
     public GameObject[] civilians;
     public LogicScript logic;
@@ -51,8 +51,8 @@ public class TutorialAllEvents : MonoBehaviour
 
         logic = GameObject.FindGameObjectWithTag("Logic").GetComponent<LogicScript>();
 
-        title = GameObject.FindGameObjectWithTag("TitleDrop").GetComponent<Text>();
-        title.enabled = false;
+        //title = GameObject.FindGameObjectWithTag("TitleDrop").GetComponent<Text>();
+        //title.enabled = false;
         civilians = GameObject.FindGameObjectsWithTag("Civilian");
         civilianScripts = new Queue<CivilianScript>();
         foreach (GameObject civilian in civilians) 
@@ -184,7 +184,11 @@ public class TutorialAllEvents : MonoBehaviour
         }
         pilotsDeath.GetComponent<ParticleSystem>().Play();
         pilotsDeath.GetComponent<AudioSource>().Play();
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(.01f);
+        foreach (CivilianScript civilianScript in civilianScripts)
+        {
+            civilianScript.turnOffTargetingReticle();
+        }
         lastCutscenePartFour.triggerDisplayDialogue();
     }
 
@@ -196,7 +200,7 @@ public class TutorialAllEvents : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
         disablePlayerMovement();
-        title.enabled = true;
+        title.SetActive(true);
         StartCoroutine(startNextScene());
     }
     public IEnumerator startNextScene()
