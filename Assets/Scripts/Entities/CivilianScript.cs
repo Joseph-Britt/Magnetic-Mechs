@@ -12,4 +12,8 @@ public class CivilianScript : MonoBehaviour
     {
         targetingReticle.GetComponent<SpriteRenderer>().enabled = true;
     }
+    public void turnOffTargetingReticle()
+    {
+        targetingReticle.GetComponent<SpriteRenderer>().enabled = false;
+    }
 }
