@@ -15,6 +15,8 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
     public Transform page1Parent;
     public Transform page2Parent;
     public GameObject currentLevelCapacitor;
+    public GameObject previousButton;
+    public GameObject nextButton;
     [Header("Variables")]
     public List<GameObject> buttons;
     public List<GameObject> page1Buttons;
@@ -27,8 +29,8 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
     private float readyToChange = 0f;
     public int currentSelection = 0;
     public int currentPage = 0;
-    private int currentLevel = 0;
-    private int currentLevelPage;
+    public int currentLevel = 0;
+    public int currentLevelPage;
 
     private void Awake()
     {
@@ -47,6 +49,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             {
                 button.GetComponent<Button>().interactable = true;
                 button.GetComponent<Animator>().runtimeAnimatorController = beatenLevelAnim;
+                button.transform.GetChild(button.transform.childCount - 1).gameObject.SetActive(true);
             }
             else
             {
@@ -58,6 +61,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             {
                 currentPicked = true;
                 button.GetComponent<Animator>().runtimeAnimatorController = currentLevelAnim;
+                button.transform.GetChild(button.transform.childCount - 1).gameObject.SetActive(false);
                 currentLevelCapacitor.transform.position = button.transform.position;
                 currentLevel = i - 1;
                 currentLevelPage = 0;
@@ -74,6 +78,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             {
                 button.GetComponent<Button>().interactable = true;
                 button.GetComponent<Animator>().runtimeAnimatorController = beatenLevelAnim;
+                button.transform.GetChild(button.transform.childCount - 1).gameObject.SetActive(true);
             }
             else
             {
@@ -85,6 +90,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             {
                 currentPicked = true;
                 button.GetComponent<Animator>().runtimeAnimatorController = currentLevelAnim;
+                button.transform.GetChild(button.transform.childCount - 1).gameObject.SetActive(false);
                 currentLevelCapacitor.transform.position = button.transform.position;
                 currentLevel = i - 1;
                 currentLevelPage = 1;
@@ -97,6 +103,11 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
         SetButtonSize(currentSelection);
         page1Parent.gameObject.SetActive(true);
         page2Parent.gameObject.SetActive(false);
+        previousButton.SetActive(false);
+        if (!PlayerPrefs.HasKey($"Level {buttons.Count + 1}") || PlayerPrefs.GetInt($"Level {buttons.Count + 1}") != 1)
+        {
+            nextButton.SetActive(false);
+        }
     }
 
     public void Move(InputAction.CallbackContext context)
@@ -104,7 +115,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
         float change = context.ReadValue<Vector2>().x;
         if(Time.realtimeSinceStartup > readyToChange)
         {
-            if(change > .25 && (currentPage * buttons.Count) + currentSelection < currentLevel)
+            if(change > .25 && (currentPage * page1Buttons.Count) + currentSelection < currentLevel)
             {
                 currentSelection += 1;
                 if(currentSelection >= buttons.Count)
@@ -115,6 +126,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
                         buttons = page2Buttons;
                         page1Parent.gameObject.SetActive(false);
                         page2Parent.gameObject.SetActive(true);
+                        UpdateNavButtons();
                     }
                     currentSelection = 0;
                 }
@@ -129,6 +141,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
                         buttons = page1Buttons;
                         page1Parent.gameObject.SetActive(true);
                         page2Parent.gameObject.SetActive(false);
+                        UpdateNavButtons();
                     }
                     currentSelection = buttons.Count - 1;
                 }
@@ -162,11 +175,66 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
 
     public void HoverButton(int hover)
     {
-        if (PlayerPrefs.HasKey($"Level {hover + (currentPage * buttons.Count) + 1}") && PlayerPrefs.GetInt($"Level {hover + (currentPage * buttons.Count) + 1}") == 1)
+        if (PlayerPrefs.HasKey($"Level {hover + (currentPage * page1Buttons.Count) + 1}") && PlayerPrefs.GetInt($"Level {hover + (currentPage * page1Buttons.Count) + 1}") == 1)
         {
             currentSelection = hover;
             readyToChange = Time.realtimeSinceStartup + delay;
             SetButtonSize(currentSelection);
+        }
+    }
+
+    public void NextPage()
+    {
+        if (currentPage == 1 || !PlayerPrefs.HasKey($"Level {buttons.Count + 1}") || PlayerPrefs.GetInt($"Level {buttons.Count + 1}") != 1)
+        {
+            return;
+        }
+
+        currentPage = 1;
+        buttons = page2Buttons;
+        nextButton.SetActive(false);
+        previousButton.SetActive(true);
+        page1Parent.gameObject.SetActive(false);
+        page2Parent.gameObject.SetActive(true);
+        currentSelection = 0;
+        currentLevelCapacitor.SetActive(currentLevelPage == currentPage);
+        readyToChange = Time.realtimeSinceStartup + delay;
+        SetButtonSize(currentSelection);
+    }
+
+    public void PreviousPage()
+    {
+        if (currentPage == 0)
+        {
+            return;
+        }
+
+        currentPage = 0;
+        buttons = page1Buttons;
+        nextButton.SetActive(true);
+        previousButton.SetActive(false);
+        page1Parent.gameObject.SetActive(true);
+        page2Parent.gameObject.SetActive(false);
+        currentSelection = 0;
+        currentLevelCapacitor.SetActive(currentLevelPage == currentPage);
+        readyToChange = Time.realtimeSinceStartup + delay;
+        SetButtonSize(currentSelection);
+    }
+
+    public void UpdateNavButtons()
+    {
+        if (currentPage == 1)
+        {
+            nextButton.SetActive(false);
+            previousButton.SetActive(true);
+        }
+        else
+        {
+            if (PlayerPrefs.HasKey($"Level {buttons.Count + 1}") && PlayerPrefs.GetInt($"Level {buttons.Count + 1}") == 1)
+            {
+                nextButton.SetActive(true);
+            }
+            previousButton.SetActive(false);
         }
     }
 

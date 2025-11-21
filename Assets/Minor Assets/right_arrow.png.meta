@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 55e4b61fdcc92f340910d1436a68e9cf
+guid: ee648133894728440aee926f894d2269
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2833450091730282913
-    second: beaten_level_connector_0
+      213: -3547801648469258843
+    second: right_arrow_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,23 +126,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: beaten_level_connector_0
+      name: right_arrow_0
       rect:
         serializedVersion: 2
-        x: 226
-        y: 135
-        width: 44
-        height: 2
+        x: 6
+        y: 13
+        width: 52
+        height: 38
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1a9a16e98df625720800000000000000
-      internalID: 2833450091730282913
+      spriteID: 5adc171a23da3cec0800000000000000
+      internalID: -3547801648469258843
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 0dd0552483515374094582d033d3a887
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      beaten_level_connector_0: 2833450091730282913
+      right_arrow_0: -3547801648469258843
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
