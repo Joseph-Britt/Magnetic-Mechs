@@ -13,6 +13,9 @@ public class LaserScript : MonoBehaviour
     public LineRenderer lineRendererMiddle;
     public LineRenderer lineRendererLeft;
     public LineRenderer lineRendererRight;
+    public GameObject hitParticles;
+    public GameObject hitImpact;
+    public GameObject laserStart;
     public GameObject ObjectHit;
     public Transform playerTransform;
     public PlayerScript playerScript;
@@ -187,7 +190,16 @@ public class LaserScript : MonoBehaviour
     {
         lineRenderer.SetPosition(0, startPosition);
         lineRenderer.SetPosition(1, endPosition);
-        if (explosionTimer > explosionTime && ExplosionsAvailableQueue.Count >0)
+        if (hitParticles != null) {
+            hitParticles.transform.localPosition = new Vector3((endPosition - startPosition).magnitude + (new Vector3(startPosition.x, startPosition.y, 0) - transform.position).magnitude, 0, 0);
+        }
+        if (hitImpact != null) {
+            hitImpact.transform.localPosition = new Vector3((endPosition - startPosition).magnitude + (new Vector3(startPosition.x, startPosition.y, 0) - transform.position).magnitude, 0, 0);
+        }
+        if (laserStart != null) {
+            laserStart.transform.localPosition = new Vector3((new Vector3(startPosition.x, startPosition.y, 0) - transform.position).magnitude, 0, 0);
+        }
+        if (explosionTimer > explosionTime && ExplosionsAvailableQueue.Count > 0)
         {
             CreateExplosion(startPosition, endPosition);
             explosionTimer = 0;
@@ -231,6 +243,15 @@ public class LaserScript : MonoBehaviour
         lineRendererMiddle.enabled = true;
         lineRendererLeft.enabled = true;
         lineRendererRight.enabled = true;
+        if (hitParticles != null) {
+            hitParticles.SetActive(true);
+        }
+        if (hitImpact != null) {
+            hitImpact.SetActive(true);
+        }
+        if (laserStart != null) {
+            laserStart.SetActive(true);
+        }
         laserEnabled = true;
     }
     void disableLaserRenderer()
@@ -238,6 +259,15 @@ public class LaserScript : MonoBehaviour
         lineRendererMiddle.enabled = false;
         lineRendererLeft.enabled = false;
         lineRendererRight.enabled = false;
+        if (hitParticles != null) {
+            hitParticles.SetActive(false);
+        }
+        if (hitImpact != null) {
+            hitImpact.SetActive(false);
+        }
+        if (laserStart != null) {
+            laserStart.SetActive(false);
+        }
         laserEnabled = false;
     }
 }
