@@ -770,8 +770,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 881e3f52c86c94f26a60718d35627cd8, type: 3}
-  m_Resource: {fileID: 8300000, guid: 881e3f52c86c94f26a60718d35627cd8, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 0e98e9188f2418a4b83c78606366da2e, type: 3}
+  m_Resource: {fileID: 8300000, guid: 0e98e9188f2418a4b83c78606366da2e, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.5
   m_Pitch: 1
@@ -13268,6 +13268,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  inGroundLayer:
+    serializedVersion: 2
+    m_Bits: 0
   jumpPressed: 0
   jumpTimer: 0
   maxYSpeedTimer: 0
@@ -13284,7 +13287,9 @@ MonoBehaviour:
   jetpackBackwardsOn: 0
   gravity: 1
   repelOn: 0
+  attractButtonHeld: 0
   attractOn: 0
+  holdToAttract: 0
   virtualCamera: {fileID: 0}
   mousePosition: {x: 0, y: 0}
   mouseRelativePosition: {x: 0, y: 0}
@@ -13298,8 +13303,6 @@ MonoBehaviour:
   DashingDust: {fileID: 4166812497723045390}
   magnetAttractionAudio: {fileID: 7391205654986859350}
   magnetRepulsionAudio: {fileID: 7487317075014682717}
-  runningFrictionMaterial: {fileID: 6200000, guid: 27742e516227ad5418d6f782f704767f, type: 2}
-  gradualStoppingFrictionMaterial: {fileID: 6200000, guid: 053d420f72982034bb5f9d48911d8889, type: 2}
   lowFrictionMaterial: {fileID: 6200000, guid: 3ee494f8338fa54478a191a5997c26a9, type: 2}
   highFrictionMaterial: {fileID: 6200000, guid: e8dde3c8cfa42fb4d8297714ed03aa18, type: 2}
   frictionLerpSpeed: 10

@@ -582,7 +582,7 @@ public class PlayerScript : MonoBehaviour
     {
         myRigidbody2D.linearVelocity = new Vector2(myRigidbody2D.linearVelocity.x, 0);
         myRigidbody2D.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
-        jumpSound.Play();
+        //jumpSound.Play();
         //Instantiate(JumpDust, new Vector3(transform.position.x, transform.position.y - groundLength * 3 / 4, transform.position.z), transform.rotation);
         jumpTimer = 0;
     }
