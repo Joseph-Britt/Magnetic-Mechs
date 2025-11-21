@@ -582,7 +582,7 @@ public class PlayerScript : MonoBehaviour
     {
         myRigidbody2D.linearVelocity = new Vector2(myRigidbody2D.linearVelocity.x, 0);
         myRigidbody2D.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
-        jumpSound.Play();
+        //jumpSound.Play();
         //Instantiate(JumpDust, new Vector3(transform.position.x, transform.position.y - groundLength * 3 / 4, transform.position.z), transform.rotation);
         jumpTimer = 0;
     }
@@ -768,7 +768,7 @@ public class PlayerScript : MonoBehaviour
             if (collision.gameObject.layer == 16) // rock
             {
                 Vector2 relativePosition = transform.position - collision.transform.position;
-                DamagePlayer(1, relativePosition.normalized, 1f);
+                DamagePlayer(1, relativePosition.normalized, 0f);
             }
             if (collision.gameObject.layer == 7) // enemy
             {
@@ -984,7 +984,7 @@ public class PlayerScript : MonoBehaviour
         bool inGround= (Physics2D.Raycast(transform.position - distanceToLeg/2 + inGroundOffset, Vector2.down, groundLength, inGroundLayer) || Physics2D.Raycast(transform.position + distanceToLeg / 2 + inGroundOffset, Vector2.down, groundLength, inGroundLayer));
         if (inGround)
         {
-            KillPlayer();
+            healthScript.HandlePlayerDeath();
         }
     }
     private void OnDrawGizmos()
