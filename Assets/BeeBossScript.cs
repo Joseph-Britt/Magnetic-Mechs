@@ -23,7 +23,7 @@ public class BeeBossScript : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null) playerTransform = player.GetComponent<Transform>();
         else Debug.Log("player could not be found");
-        sprite = GetComponent<SpriteRenderer>();
+        //sprite = GetComponent<SpriteRenderer>();
         endingPlatformGrid.SetActive(false);
         bossActive = false;
     }
