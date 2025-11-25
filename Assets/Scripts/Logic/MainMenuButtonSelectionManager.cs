@@ -18,6 +18,8 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
     public GameObject previousButton;
     public GameObject nextButton;
     public GameObject beatenConnectors;
+    private GameObject beatenConnectorsPageOne;
+    private GameObject beatenConnectorsPageTwo;
     [Header("Variables")]
     public List<GameObject> buttons;
     public List<GameObject> page1Buttons;
@@ -41,6 +43,8 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
         }
         int i = 1;
         bool currentPicked = false;
+        beatenConnectorsPageOne = beatenConnectors.transform.GetChild(0).gameObject;
+        beatenConnectorsPageTwo = beatenConnectors.transform.GetChild(1).gameObject;
         foreach (Transform child in page1Parent)
         {
             if (child.gameObject.GetComponent<Button>() == null) continue;
@@ -50,7 +54,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             {
                 button.GetComponent<Button>().interactable = true;
                 button.GetComponent<Animator>().runtimeAnimatorController = beatenLevelAnim;
-                beatenConnectors.transform.GetChild(i - 1).gameObject.SetActive(true);
+                beatenConnectorsPageOne.transform.GetChild(i - 1).gameObject.SetActive(true);
             }
             else
             {
@@ -62,7 +66,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             {
                 currentPicked = true;
                 button.GetComponent<Animator>().runtimeAnimatorController = currentLevelAnim;
-                beatenConnectors.transform.GetChild(i - 1).gameObject.SetActive(false);
+                beatenConnectorsPageOne.transform.GetChild(i - 1).gameObject.SetActive(false);
                 currentLevelCapacitor.transform.position = button.transform.position;
                 currentLevel = i - 1;
                 currentLevelPage = 0;
@@ -79,7 +83,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             {
                 button.GetComponent<Button>().interactable = true;
                 button.GetComponent<Animator>().runtimeAnimatorController = beatenLevelAnim;
-                beatenConnectors.transform.GetChild(i - 1).gameObject.SetActive(true);
+                beatenConnectorsPageTwo.transform.GetChild((i - 1)%8).gameObject.SetActive(true);
             }
             else
             {
@@ -91,7 +95,7 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
             {
                 currentPicked = true;
                 button.GetComponent<Animator>().runtimeAnimatorController = currentLevelAnim;
-                beatenConnectors.transform.GetChild(i - 1).gameObject.SetActive(false);
+                beatenConnectorsPageTwo.transform.GetChild((i - 1)%8).gameObject.SetActive(false);
                 currentLevelCapacitor.transform.position = button.transform.position;
                 currentLevel = i - 1;
                 currentLevelPage = 1;
@@ -197,6 +201,8 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
         previousButton.SetActive(true);
         page1Parent.gameObject.SetActive(false);
         page2Parent.gameObject.SetActive(true);
+        beatenConnectorsPageOne.SetActive(false);
+        beatenConnectorsPageTwo.SetActive(true);
         currentSelection = 0;
         currentLevelCapacitor.SetActive(currentLevelPage == currentPage);
         readyToChange = Time.realtimeSinceStartup + delay;
@@ -216,6 +222,8 @@ public class MainMenuButtonSelectionManager : MonoBehaviour
         previousButton.SetActive(false);
         page1Parent.gameObject.SetActive(true);
         page2Parent.gameObject.SetActive(false);
+        beatenConnectorsPageOne.SetActive(true);
+        beatenConnectorsPageTwo.SetActive(false);
         currentSelection = 0;
         currentLevelCapacitor.SetActive(currentLevelPage == currentPage);
         readyToChange = Time.realtimeSinceStartup + delay;

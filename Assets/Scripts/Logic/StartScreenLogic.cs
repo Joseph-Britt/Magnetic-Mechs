@@ -55,7 +55,6 @@ public class StartScreenLogic : MonoBehaviour
     }
     public void Move(InputAction.CallbackContext context)
     {
-        Debug.Log("test");
         if (onStart)
         {
             startMenuButtonSelectionManager.Move(context);
