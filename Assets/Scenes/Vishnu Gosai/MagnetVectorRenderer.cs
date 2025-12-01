@@ -196,6 +196,12 @@ public class MagnetVectorRenderer : MonoBehaviour
     [Range(0f, 1f)]
     public float arcAlpha = 1f;
 
+    [Tooltip("Spline length at which this arc fades to 0% of its base alpha. At length 0 it's 100%. <= 0 disables distance fade on this arc.")]
+    public float maxSplineLength = 0f;
+
+    [HideInInspector]
+    public float baseArcAlpha = 1f; // what MagnetEffectMaterialManager sets as the base alpha
+
     [Header("Visibility")]
     [Tooltip("If ON, this arc (and child arcs) only render while the magnet is stopped (has hit the wall).")]
     public bool onlyShowWhenStopped = false;
@@ -219,23 +225,23 @@ public class MagnetVectorRenderer : MonoBehaviour
     private ParticleSystem basePS;
     private ParticleSystem magnetPS;
 
-    // NEW: flash + glow + stop-delay state tracking
-    private bool hasMovedThisActivation; // has the magnet moved at least once this shot?
-    private bool lastStoppedFlag;        // magnetIsStopped from previous frame
+    // stop-delay / flash / glow state tracking
+    private bool hasMovedThisActivation;
+    private bool lastStoppedFlag;
     private float stoppedSinceTime = -1f;
 
     // ----- stepped arc internals -----
     private bool lastSteppedArc;
     private bool steppedInitialized;
-    private float steppedSampleTime; // time fed into noise; only changes on step
-    private float nextStepTime;      // when to jump next
-    private float currentHold;       // current step hold duration
+    private float steppedSampleTime;
+    private float nextStepTime;
+    private float currentHold;
 
     // ----- legacy child sharp sampling internals -----
     private MasterPoint[] childCachedSegment;
     private bool childHasCachedSegment;
-    private float childLifeEndTime;   // when current child segment stops being visible
-    private float childDelayEndTime;  // when we are allowed to sample the next segment
+    private float childLifeEndTime;
+    private float childDelayEndTime;
 
     // ----- tethered child arc internals -----
     private bool tetherHasArc;
@@ -250,7 +256,7 @@ public class MagnetVectorRenderer : MonoBehaviour
     // movement internals for tethered child arcs
     private bool tetherHasMovingAnchor;
     private bool tetherMovingAnchorIsA;
-    private int tetherMovementDirection; // +1 toward magnet (end), -1 toward player (start)
+    private int tetherMovementDirection;
     private float tetherNextMoveTime;
 
     // ----- random sparks pool -----
@@ -276,6 +282,9 @@ public class MagnetVectorRenderer : MonoBehaviour
         renderer2D = GetComponent<SpriteShapeRenderer>();
         if (controller != null)
             spline = controller.spline;
+
+        // this is our initial "base" alpha before distance fade.
+        baseArcAlpha = arcAlpha;
 
         // Only master / normal need the spawner; child copies geometry only.
         if (!isChildToMasterArray)
@@ -311,7 +320,6 @@ public class MagnetVectorRenderer : MonoBehaviour
         }
         else if (isMasterArray)
         {
-            // Start hidden; we'll enable later if canGenerateTetheredArcs is true and magnet state allows.
             if (renderer2D != null)
                 renderer2D.enabled = false;
         }
@@ -347,7 +355,7 @@ public class MagnetVectorRenderer : MonoBehaviour
         if (isChildToMasterArray)
         {
             UpdateFromMasterArray();
-            UpdateAlphaOnMaterial();
+            UpdateAlphaWithDistanceFade();
             return;
         }
 
@@ -376,7 +384,6 @@ public class MagnetVectorRenderer : MonoBehaviour
             magnetIsStopped = false;
             magnetMoving = false;
 
-            // reset stepped state so next activation snaps fresh
             steppedInitialized = false;
             lastSteppedArc = steppedArc;
 
@@ -386,13 +393,12 @@ public class MagnetVectorRenderer : MonoBehaviour
             UpdateSparks(null, null);
             StopAllRandomSparks();
 
-            // reset stop-delay / flash / glow state
             stoppedSinceTime = -1f;
             hasMovedThisActivation = false;
             lastStoppedFlag = false;
             StopGlowFX();
 
-            UpdateAlphaOnMaterial();
+            UpdateAlphaWithDistanceFade();
             return;
         }
 
@@ -405,7 +411,7 @@ public class MagnetVectorRenderer : MonoBehaviour
                 UpdateSparks(null, null);
                 StopAllRandomSparks();
                 StopGlowFX();
-                UpdateAlphaOnMaterial();
+                UpdateAlphaWithDistanceFade();
                 return;
             }
         }
@@ -422,7 +428,6 @@ public class MagnetVectorRenderer : MonoBehaviour
             stoppedSinceTime = -1f;
         }
 
-        // Compute transitions for stop / moving
         bool justStopped = false;
         bool justStartedMoving = false;
 
@@ -467,7 +472,7 @@ public class MagnetVectorRenderer : MonoBehaviour
             lastStoppedFlag = false;
             StopGlowFX();
 
-            UpdateAlphaOnMaterial();
+            UpdateAlphaWithDistanceFade();
             return;
         }
 
@@ -479,7 +484,7 @@ public class MagnetVectorRenderer : MonoBehaviour
             lastMagnetActive = true;
             magnetIsStopped = true;
             magnetMoving = false;
-            stoppedTimer = stoppedMinTime; // treat as fully stopped
+            stoppedTimer = stoppedMinTime;
 
             steppedInitialized = false;
             lastSteppedArc = steppedArc;
@@ -506,7 +511,6 @@ public class MagnetVectorRenderer : MonoBehaviour
                 StopAllRandomSparks();
             }
 
-            // Trigger flash + glow at stop (no visibility delay)
             if (justStopped)
             {
                 PlayFlashFX(baseLocal, endLocal);
@@ -517,7 +521,7 @@ public class MagnetVectorRenderer : MonoBehaviour
                 StopGlowFX();
             }
 
-            UpdateAlphaOnMaterial();
+            UpdateAlphaWithDistanceFade();
             return;
         }
 
@@ -527,14 +531,12 @@ public class MagnetVectorRenderer : MonoBehaviour
         desiredInteriorPoints = ComputeBufferedInteriorCount(splineLength, dropInterval);
         int targetCount = desiredInteriorPoints + 2;
 
-        float arcTime = GetArcTime(); // smooth or stepped
+        float arcTime = GetArcTime();
 
         if (isMasterArray)
         {
-            // Always compute & store into masterArray
             UpdateMasterArray(targetCount, baseLocal, endLocal, dir, perp, arcTime, splineLength);
 
-            // If canGenerateTetheredArcs is ON, also render this master as a visible tether.
             if (canGenerateTetheredArcs && spline != null && controller != null)
             {
                 CopyMasterArrayToOwnSpline();
@@ -542,9 +544,8 @@ public class MagnetVectorRenderer : MonoBehaviour
         }
         else
         {
-            // Normal non-master arc: build directly into the spline
             if (spline == null || controller == null)
-                return; // safety
+                return;
 
             AdjustPointCount(targetCount);
 
@@ -559,7 +560,6 @@ public class MagnetVectorRenderer : MonoBehaviour
                 float off = ComputeArcOffset(tNorm, arcTime);
                 p += perp * off;
 
-                // extra chaos (optional) for main arcs as well
                 p = ApplyExtraChaosNoise(p, dir, perp, tNorm, arcTime);
 
                 spline.SetPosition(i, p);
@@ -596,7 +596,6 @@ public class MagnetVectorRenderer : MonoBehaviour
             StopAllRandomSparks();
         }
 
-        // Play flash + start glow at the moment we detect stop
         if (justStopped)
         {
             PlayFlashFX(baseLocal, endLocal);
@@ -609,8 +608,7 @@ public class MagnetVectorRenderer : MonoBehaviour
 
         lastSteppedArc = steppedArc;
 
-        // Sync alpha -> MPB
-        UpdateAlphaOnMaterial();
+        UpdateAlphaWithDistanceFade();
     }
 
     // ---------- CHILD: COPY FROM MASTER ARRAY (legacy + tethered) ----------
@@ -642,11 +640,10 @@ public class MagnetVectorRenderer : MonoBehaviour
             return;
         }
 
-        // Mirror state flags from master (for visibility & sparks behavior).
+        // Mirror state flags from master.
         magnetMoving = masterArraySource.magnetMoving;
         magnetIsStopped = masterArraySource.magnetIsStopped;
 
-        // Track stop time for delay on child too
         if (magnetIsStopped && !lastStoppedFlag)
         {
             stoppedSinceTime = Time.time;
@@ -657,7 +654,6 @@ public class MagnetVectorRenderer : MonoBehaviour
         }
         lastStoppedFlag = magnetIsStopped;
 
-        // Make sure we have a spline to draw on.
         if (controller == null || spline == null)
         {
             controller = GetComponent<SpriteShapeController>();
@@ -676,21 +672,18 @@ public class MagnetVectorRenderer : MonoBehaviour
             return;
         }
 
-        // If master wants tethered child arcs, use the new system.
         if (masterArraySource.canGenerateTetheredArcs)
         {
             UpdateTetheredChildFromMaster(arr);
             return;
         }
 
-        // Otherwise, legacy behavior (segment copy / sharpChild).
         float now = Time.time;
         bool baseAllow = IsStopDelayComplete();
         bool allowShow = baseAllow && burstVisible;
 
         if (!sharpChild)
         {
-            // Continuous copy: pick a fresh random segment each frame.
             if (!allowShow)
             {
                 if (renderer2D != null)
@@ -708,12 +701,10 @@ public class MagnetVectorRenderer : MonoBehaviour
             SelectRandomSegmentFromMaster(arr, out start, out segCount);
             CopySegmentToSpline(arr, start, segCount);
 
-            // Random sparks based on the child spline geometry
             UpdateRandomSparks();
         }
         else
         {
-            // Sharp: sample once, hold for lifetime, then hide until delay end, then resample.
             if (!childHasCachedSegment || now >= childDelayEndTime)
             {
                 int start, segCount;
@@ -723,12 +714,11 @@ public class MagnetVectorRenderer : MonoBehaviour
                 float life = RandomRangeSafe(childLifetimeRange);
                 float delayTotal = RandomRangeSafe(childDelayRange);
 
-                // Ensure total delay is at least the visible lifetime
                 if (delayTotal < life)
                     delayTotal = life;
 
-                childLifeEndTime = now + life;        // visible until here
-                childDelayEndTime = now + delayTotal; // next resample at this time
+                childLifeEndTime = now + life;
+                childDelayEndTime = now + delayTotal;
             }
 
             bool visible = childHasCachedSegment &&
@@ -742,12 +732,10 @@ public class MagnetVectorRenderer : MonoBehaviour
 
                 CopyCachedSegmentToSpline();
 
-                // Random sparks only while visible
                 UpdateRandomSparks();
             }
             else
             {
-                // Hidden during the remainder of the delay window or while magnet moving.
                 if (renderer2D != null)
                     renderer2D.enabled = false;
 
@@ -793,10 +781,8 @@ public class MagnetVectorRenderer : MonoBehaviour
             return;
         }
 
-        // If we have an active tether arc, update or end it.
         if (tetherHasArc)
         {
-            // Lifetime ended -> kill arc and schedule next spawn
             if (now >= tetherLifeEndTime)
             {
                 tetherHasArc = false;
@@ -811,14 +797,13 @@ public class MagnetVectorRenderer : MonoBehaviour
                 return;
             }
 
-            // Ensure anchors are still valid (master may have shrunk)
             int masterCount = arr.Length;
             if (tetherAnchorMasterIndexA >= masterCount ||
                 tetherAnchorMasterIndexB >= masterCount)
             {
                 tetherHasArc = false;
                 tetherHasMovingAnchor = false;
-                tetherNextSpawnTime = now; // retry soon
+                tetherNextSpawnTime = now;
                 if (renderer2D != null)
                     renderer2D.enabled = false;
                 UpdateSparks(null, null);
@@ -829,16 +814,13 @@ public class MagnetVectorRenderer : MonoBehaviour
             if (renderer2D != null)
                 renderer2D.enabled = true;
 
-            // Move the chosen anchor along the master spline if enabled
             UpdateMovingAnchor(arr, now);
 
-            // Update geometry each frame while alive
             UpdateTetheredChildGeometry(arr, now);
             UpdateRandomSparks();
             return;
         }
 
-        // No active tether: respect delay before spawning a new one
         if (now < tetherNextSpawnTime)
         {
             if (renderer2D != null)
@@ -849,7 +831,6 @@ public class MagnetVectorRenderer : MonoBehaviour
             return;
         }
 
-        // Try to spawn a new tethered child arc
         if (!TrySpawnTetheredChild(arr, now))
         {
             tetherNextSpawnTime = now + RandomRangeSafe(childDelayRange);
@@ -860,7 +841,6 @@ public class MagnetVectorRenderer : MonoBehaviour
             return;
         }
 
-        // First frame after spawn: build geometry
         if (renderer2D != null)
             renderer2D.enabled = true;
 
@@ -872,9 +852,9 @@ public class MagnetVectorRenderer : MonoBehaviour
     {
         int total = arr.Length;
         if (total < 4)
-            return false; // need enough master points for spacing
+            return false;
 
-        int maxSpanIndices = total - 1; // 0 .. last
+        int maxSpanIndices = total - 1;
 
         float minFrac = Mathf.Clamp01(childCopyFractionRange.x);
         float maxFrac = Mathf.Clamp01(childCopyFractionRange.y);
@@ -999,7 +979,7 @@ public class MagnetVectorRenderer : MonoBehaviour
 
         int nextIndex = idx + tetherMovementDirection;
 
-               if (nextIndex <= 0 || nextIndex >= lastIndex)
+        if (nextIndex <= 0 || nextIndex >= lastIndex)
         {
             int clampedNext = Mathf.Clamp(nextIndex, 0, lastIndex);
             if (tetherMovingAnchorIsA)
@@ -1047,6 +1027,10 @@ public class MagnetVectorRenderer : MonoBehaviour
             length = 0.0001f;
         Vector3 dir = chord / length;
 
+        // splineLength here is the local segment length, but distance fade
+        // for children will use the master's splineLength via GetEffectiveSplineLength().
+        splineLength = length;
+
         Vector3 jitterPerp = new Vector3(-dir.y, dir.x, 0f);
 
         float arcTime = GetArcTime();
@@ -1063,7 +1047,6 @@ public class MagnetVectorRenderer : MonoBehaviour
             float off = ComputeArcOffset(tNorm, arcTime);
             p += jitterPerp * off;
 
-            // extra chaos noise (optional)
             p = ApplyExtraChaosNoise(p, dir, jitterPerp, tNorm, arcTime);
 
             spline.SetPosition(i, p);
@@ -1157,6 +1140,8 @@ public class MagnetVectorRenderer : MonoBehaviour
         Vector3 baseLocal = new Vector3(arr[startIndex].position.x, arr[startIndex].position.y, 0f);
         Vector3 endLocal  = new Vector3(arr[startIndex + segmentCount - 1].position.x,
                                         arr[startIndex + segmentCount - 1].position.y, 0f);
+        splineLength = Vector3.Distance(baseLocal, endLocal);
+
         UpdateSparks(baseLocal, endLocal);
     }
 
@@ -1207,6 +1192,8 @@ public class MagnetVectorRenderer : MonoBehaviour
         Vector3 baseLocal = new Vector3(childCachedSegment[0].position.x, childCachedSegment[0].position.y, 0f);
         Vector3 endLocal  = new Vector3(childCachedSegment[count - 1].position.x,
                                         childCachedSegment[count - 1].position.y, 0f);
+        splineLength = Vector3.Distance(baseLocal, endLocal);
+
         UpdateSparks(baseLocal, endLocal);
     }
 
@@ -1328,10 +1315,6 @@ public class MagnetVectorRenderer : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// When isMasterArray && canGenerateTetheredArcs, use this to render the
-    /// master's own arc using its masterArray data.
-    /// </summary>
     private void CopyMasterArrayToOwnSpline()
     {
         if (masterArray == null || masterArray.Length < 2 || spline == null || controller == null)
@@ -1350,6 +1333,10 @@ public class MagnetVectorRenderer : MonoBehaviour
             spline.SetLeftTangent(i, new Vector3(mp.leftTangent.x, mp.leftTangent.y, 0f));
             spline.SetRightTangent(i, new Vector3(mp.rightTangent.x, mp.rightTangent.y, 0f));
         }
+
+        Vector3 first = new Vector3(masterArray[0].position.x, masterArray[0].position.y, 0f);
+        Vector3 last  = new Vector3(masterArray[count - 1].position.x, masterArray[count - 1].position.y, 0f);
+        splineLength = Vector3.Distance(first, last);
 
         controller.RefreshSpriteShape();
     }
@@ -1740,23 +1727,18 @@ public class MagnetVectorRenderer : MonoBehaviour
 
     private bool IsStopDelayComplete()
     {
-        // If "only show when stopped" is off, always visible.
         if (!onlyShowWhenStopped)
             return true;
 
-        // If we're not actually stopped, we can't show yet.
         if (!magnetIsStopped)
             return false;
 
-        // No extra delay configured.
-               if (stopShowDelay <= 0f)
+        if (stopShowDelay <= 0f)
             return true;
 
-        // Haven't recorded when we stopped yet.
         if (stoppedSinceTime < 0f)
             return false;
 
-        // Wait until (stoppedSinceTime + delay).
         return Time.time >= stoppedSinceTime + stopShowDelay;
     }
 
@@ -1796,8 +1778,6 @@ public class MagnetVectorRenderer : MonoBehaviour
             stoppedTimer = 0f;
             magnetMoving = true;
             magnetIsStopped = false;
-
-            // We've seen real movement during this activation
             hasMovedThisActivation = true;
         }
         else
@@ -1856,6 +1836,7 @@ public class MagnetVectorRenderer : MonoBehaviour
         controller.RefreshSpriteShape();
 
         desiredInteriorPoints = 0;
+        splineLength = 0f;
         magnetIsStopped = false;
         magnetMoving = false;
         stoppedTimer = 0f;
@@ -1881,12 +1862,49 @@ public class MagnetVectorRenderer : MonoBehaviour
         if (arcMPB == null)
             arcMPB = new MaterialPropertyBlock();
 
+        baseArcAlpha = arcAlpha; // keep base aligned with whatever is set before this call
+
         renderer2D.GetPropertyBlock(arcMPB);
         arcMPB.SetFloat("_alpha", arcAlpha);
         renderer2D.SetPropertyBlock(arcMPB);
 
         hasArcMPB = true;
         lastArcAlpha = arcAlpha;
+    }
+
+    // Manager-side helper for setting base alpha
+    public void SetBaseArcAlpha(float alpha)
+    {
+        baseArcAlpha = alpha;
+    }
+
+    // Effective length used for distance fade:
+    // - non-child: this.splineLength
+    // - child: parent's splineLength (master arc)
+    private float GetEffectiveSplineLength()
+    {
+        if (isChildToMasterArray && masterArraySource != null)
+        {
+            return Mathf.Max(0f, masterArraySource.splineLength);
+        }
+
+        return Mathf.Max(0f, splineLength);
+    }
+
+    private void ApplyDistanceFade()
+    {
+        // If no distance fade configured, just use base alpha.
+        if (maxSplineLength <= 0f)
+        {
+            arcAlpha = baseArcAlpha;
+            return;
+        }
+
+        float len = GetEffectiveSplineLength();
+        float t = Mathf.Clamp01(len / maxSplineLength); // 0 at 0 length, 1 at max
+        float fade = 1f - t;                            // 1 -> full alpha, 0 -> fully faded
+
+        arcAlpha = baseArcAlpha * fade;
     }
 
     private void UpdateAlphaOnMaterial()
@@ -1902,6 +1920,12 @@ public class MagnetVectorRenderer : MonoBehaviour
         renderer2D.SetPropertyBlock(arcMPB);
 
         lastArcAlpha = arcAlpha;
+    }
+
+    private void UpdateAlphaWithDistanceFade()
+    {
+        ApplyDistanceFade();
+        UpdateAlphaOnMaterial();
     }
 
     // ----- burst visibility control (called by manager) -----
