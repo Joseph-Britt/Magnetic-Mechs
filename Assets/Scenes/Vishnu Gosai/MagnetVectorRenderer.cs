@@ -85,9 +85,62 @@ public class MagnetVectorRenderer : MonoBehaviour
     [Tooltip("Particles at the magnet end.")]
     public Transform magnetSparks;
 
+    [Header("Flash FX (On Stop)")]
+    [Tooltip("One-shot flash at the player/base end when the magnet stops.")]
+    public ParticleSystem baseFlash;
+
+    [Tooltip("One-shot flash at the magnet end when the magnet stops.")]
+    public ParticleSystem magnetFlash;
+
+    [Tooltip("If true, flash systems will be snapped to the tether endpoints when they play.")]
+    public bool alignFlashToEndpoints = true;
+
+    [Header("Glow FX (Persistent While Stopped)")]
+    [Tooltip("Looping glow at the player/base end while the magnet remains stopped.")]
+    public ParticleSystem baseGlow;
+
+    [Tooltip("Looping glow at the magnet end while the magnet remains stopped.")]
+    public ParticleSystem magnetGlow;
+
+    [Tooltip("If true, glow systems will be snapped to the tether endpoints when they start playing.")]
+    public bool alignGlowToEndpoints = true;
+
     [Header("Master Array Mode")]
     [Tooltip("If ON, this script does all spline math but stores it in masterArray instead of writing to a SpriteShape.")]
     public bool isMasterArray = false;
+
+    [Header("Tethered Child Arcs (optional)")]
+    [Tooltip("When ON (on the master), children that reference this as master will use tethered child arcs instead of copying a continuous segment. Also makes the master visible.")]
+    public bool canGenerateTetheredArcs = false;
+
+    [Tooltip("Max extra interior points a tethered child arc may have beyond the minimum determined by the sampled master range.")]
+    public int childMaxExtraPoints = 6;
+
+    [Tooltip("Range for initial perpendicular amplitude of tethered child arcs (wave center).")]
+    public Vector2 childArcAmplitudeRange = new Vector2(0.2f, 0.6f);
+
+    [Header("Tethered Child Movement")]
+    [Tooltip("If ON, tethered child arcs will move one of their anchors stepwise along the master spline.")]
+    public bool enableMovement = false;
+
+    [Tooltip("Range of time each moving anchor stays on a master point before hopping to the next.")]
+    public Vector2 childAnchorStepTimeRange = new Vector2(0.03f, 0.08f);
+
+    [Header("Extra Chaos Noise (optional)")]
+    [Tooltip("If ON, apply additional chaotic jitter (perp + parallel) to this arc (main or child).")]
+    public bool enableExtraChaos = false;
+
+    [Tooltip("Extra perpendicular jitter amplitude for chaos noise.")]
+    public float extraChaosPerpJitter = 0.4f;
+
+    [Tooltip("Extra parallel jitter amplitude along the chord for chaos noise.")]
+    public float extraChaosParallelJitter = 0.3f;
+
+    [Tooltip("Chaos noise frequency multiplier along the arc.")]
+    public float extraChaosFrequency = 3.0f;
+
+    [Tooltip("Chaos noise speed multiplier over time.")]
+    public float extraChaosSpeed = 2.0f;
 
     [System.Serializable]
     public struct MasterPoint
@@ -109,16 +162,16 @@ public class MagnetVectorRenderer : MonoBehaviour
     public MagnetVectorRenderer masterArraySource;
 
     [Header("Child Copy Settings (Master -> Child)")]
-    [Tooltip("Only used when isChildToMasterArray is true. Fraction [0,1] of master points to copy as a continuous segment.")]
+    [Tooltip("Fraction [0,1] of the master arc to use for child arcs. In legacy mode it controls segment length in points; in tethered mode it controls how much of the arc the two anchor points span.")]
     public Vector2 childCopyFractionRange = new Vector2(0.4f, 1.0f);
 
-    [Tooltip("If ON, child samples a snapshot of a continuous segment and holds it for a lifetime before resampling.")]
+    [Tooltip("Only used in legacy mode (master.canGenerateTetheredArcs is OFF). If ON, child samples a snapshot of a continuous segment and holds it for a lifetime before resampling.")]
     public bool sharpChild = false;
 
-    [Tooltip("Lifetime range (seconds) for each sampled child snapshot, when sharpChild is ON.")]
+    [Tooltip("Lifetime range (seconds) for each sampled child snapshot.")]
     public Vector2 childLifetimeRange = new Vector2(0.05f, 0.15f);
 
-    [Tooltip("Extra random delay after each lifetime before the next resample (seconds).")]
+    [Tooltip("Extra random delay after each lifetime before the next resample (seconds). Gap between arcs.")]
     public Vector2 childDelayRange = new Vector2(0f, 0.05f);
 
     [Header("Random Sparks Along Spline")]
@@ -138,9 +191,23 @@ public class MagnetVectorRenderer : MonoBehaviour
     [Tooltip("Maximum number of sparks that may be active at once (size of the pool).")]
     public int maxConcurrentSparks = 5;
 
+    [Header("Material / Alpha")]
+    [Tooltip("Per-arc opacity that drives the _alpha property on the electric material.")]
+    [Range(0f, 1f)]
+    public float arcAlpha = 1f;
+
+    [Tooltip("Spline length at which this arc fades to 0% of its base alpha. At length 0 it's 100%. <= 0 disables distance fade on this arc.")]
+    public float maxSplineLength = 0f;
+
+    [HideInInspector]
+    public float baseArcAlpha = 1f; // what MagnetEffectMaterialManager sets as the base alpha
+
     [Header("Visibility")]
     [Tooltip("If ON, this arc (and child arcs) only render while the magnet is stopped (has hit the wall).")]
     public bool onlyShowWhenStopped = false;
+
+    [Tooltip("Extra delay after the magnet is considered stopped before this arc becomes visible (only used if onlyShowWhenStopped is true).")]
+    public float stopShowDelay = 0f;
 
     [Header("State Flags")]
     public bool magnetMoving;
@@ -154,28 +221,57 @@ public class MagnetVectorRenderer : MonoBehaviour
     private Vector3 lastMagnetWorldPos;
     private bool hasLastPos;
 
-    // cached particle systems (optional)
+    // cached endpoint sparks
     private ParticleSystem basePS;
     private ParticleSystem magnetPS;
+
+    // stop-delay / flash / glow state tracking
+    private bool hasMovedThisActivation;
+    private bool lastStoppedFlag;
+    private float stoppedSinceTime = -1f;
 
     // ----- stepped arc internals -----
     private bool lastSteppedArc;
     private bool steppedInitialized;
-    private float steppedSampleTime; // time fed into noise; only changes on step
-    private float nextStepTime;      // when to jump next
-    private float currentHold;       // current step hold duration
+    private float steppedSampleTime;
+    private float nextStepTime;
+    private float currentHold;
 
-    // ----- child sharp sampling internals -----
+    // ----- legacy child sharp sampling internals -----
     private MasterPoint[] childCachedSegment;
     private bool childHasCachedSegment;
-    private float childLifeEndTime;   // when current child segment stops being visible
-    private float childDelayEndTime;  // when we are allowed to sample the next segment
+    private float childLifeEndTime;
+    private float childDelayEndTime;
+
+    // ----- tethered child arc internals -----
+    private bool tetherHasArc;
+    private int tetherAnchorMasterIndexA;
+    private int tetherAnchorMasterIndexB;
+    private int tetherChildPointCount;
+    private float tetherLifeEndTime;
+    private float tetherNextSpawnTime;
+    private float tetherAmplitude;
+    private Vector3 tetherPerpLocalDir;
+
+    // movement internals for tethered child arcs
+    private bool tetherHasMovingAnchor;
+    private bool tetherMovingAnchorIsA;
+    private int tetherMovementDirection;
+    private float tetherNextMoveTime;
 
     // ----- random sparks pool -----
     private ParticleSystem[] sparksPool;
     private float[] sparkEndTimes;
     private int sparksPoolSize;
     private float nextSparksTime;
+
+    // ----- MPB internals -----
+    private MaterialPropertyBlock arcMPB;
+    private bool hasArcMPB;
+    private float lastArcAlpha = -1f;
+
+    // ----- burst visibility (controlled by manager) -----
+    private bool burstVisible = true;
 
     private bool SparksEnabled
         => sparks != null && maxConcurrentSparks > 0;
@@ -186,6 +282,9 @@ public class MagnetVectorRenderer : MonoBehaviour
         renderer2D = GetComponent<SpriteShapeRenderer>();
         if (controller != null)
             spline = controller.spline;
+
+        // this is our initial "base" alpha before distance fade.
+        baseArcAlpha = arcAlpha;
 
         // Only master / normal need the spawner; child copies geometry only.
         if (!isChildToMasterArray)
@@ -229,6 +328,25 @@ public class MagnetVectorRenderer : MonoBehaviour
         steppedInitialized = false;
         childHasCachedSegment = false;
         stoppedTimer = 0f;
+
+        tetherHasArc = false;
+        tetherHasMovingAnchor = false;
+        tetherNextSpawnTime = Time.time;
+        tetherNextMoveTime = Time.time;
+
+        hasMovedThisActivation = false;
+        lastStoppedFlag = false;
+        stoppedSinceTime = -1f;
+
+        // Ensure flash & glow FX do NOT play on awake
+        if (baseFlash != null)
+            baseFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (magnetFlash != null)
+            magnetFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (baseGlow != null)
+            baseGlow.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (magnetGlow != null)
+            magnetGlow.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     void Update()
@@ -237,6 +355,7 @@ public class MagnetVectorRenderer : MonoBehaviour
         if (isChildToMasterArray)
         {
             UpdateFromMasterArray();
+            UpdateAlphaWithDistanceFade();
             return;
         }
 
@@ -265,7 +384,6 @@ public class MagnetVectorRenderer : MonoBehaviour
             magnetIsStopped = false;
             magnetMoving = false;
 
-            // reset stepped state so next activation snaps fresh
             steppedInitialized = false;
             lastSteppedArc = steppedArc;
 
@@ -274,6 +392,13 @@ public class MagnetVectorRenderer : MonoBehaviour
 
             UpdateSparks(null, null);
             StopAllRandomSparks();
+
+            stoppedSinceTime = -1f;
+            hasMovedThisActivation = false;
+            lastStoppedFlag = false;
+            StopGlowFX();
+
+            UpdateAlphaWithDistanceFade();
             return;
         }
 
@@ -285,11 +410,36 @@ public class MagnetVectorRenderer : MonoBehaviour
             {
                 UpdateSparks(null, null);
                 StopAllRandomSparks();
+                StopGlowFX();
+                UpdateAlphaWithDistanceFade();
                 return;
             }
         }
 
         DetectMovingFlag();
+
+        // Track when we became stopped (for visibility delay)
+        if (magnetIsStopped && !lastStoppedFlag)
+        {
+            stoppedSinceTime = Time.time;
+        }
+        else if (!magnetIsStopped)
+        {
+            stoppedSinceTime = -1f;
+        }
+
+        bool justStopped = false;
+        bool justStartedMoving = false;
+
+        if (magnetIsStopped && !lastStoppedFlag && hasMovedThisActivation)
+        {
+            justStopped = true;
+        }
+        if (!magnetIsStopped && lastStoppedFlag)
+        {
+            justStartedMoving = true;
+        }
+        lastStoppedFlag = magnetIsStopped;
 
         Transform baseT = baseTransform != null ? baseTransform : transform;
         Vector3 baseLocal = transform.InverseTransformPoint(baseT.position);
@@ -316,6 +466,13 @@ public class MagnetVectorRenderer : MonoBehaviour
 
             UpdateSparks(null, null);
             StopAllRandomSparks();
+
+            stoppedSinceTime = -1f;
+            hasMovedThisActivation = false;
+            lastStoppedFlag = false;
+            StopGlowFX();
+
+            UpdateAlphaWithDistanceFade();
             return;
         }
 
@@ -327,17 +484,23 @@ public class MagnetVectorRenderer : MonoBehaviour
             lastMagnetActive = true;
             magnetIsStopped = true;
             magnetMoving = false;
-            stoppedTimer = stoppedMinTime; // treat as fully stopped
+            stoppedTimer = stoppedMinTime;
 
             steppedInitialized = false;
             lastSteppedArc = steppedArc;
 
-            bool showNow = !onlyShowWhenStopped || magnetIsStopped;
+            bool baseShow = IsStopDelayComplete();
+            bool finalShow = baseShow && burstVisible;
 
-            if (!isMasterArray && renderer2D != null)
-                renderer2D.enabled = showNow;
+            if (renderer2D != null)
+            {
+                if (isMasterArray)
+                    renderer2D.enabled = canGenerateTetheredArcs && finalShow;
+                else
+                    renderer2D.enabled = finalShow;
+            }
 
-            if (showNow)
+            if (finalShow && (!isMasterArray || canGenerateTetheredArcs))
             {
                 UpdateSparks(baseLocal, endLocal);
                 UpdateRandomSparks();
@@ -348,6 +511,17 @@ public class MagnetVectorRenderer : MonoBehaviour
                 StopAllRandomSparks();
             }
 
+            if (justStopped)
+            {
+                PlayFlashFX(baseLocal, endLocal);
+                PlayGlowFX(baseLocal, endLocal);
+            }
+            else if (justStartedMoving)
+            {
+                StopGlowFX();
+            }
+
+            UpdateAlphaWithDistanceFade();
             return;
         }
 
@@ -357,17 +531,21 @@ public class MagnetVectorRenderer : MonoBehaviour
         desiredInteriorPoints = ComputeBufferedInteriorCount(splineLength, dropInterval);
         int targetCount = desiredInteriorPoints + 2;
 
-        float arcTime = GetArcTime(); // smooth or stepped
+        float arcTime = GetArcTime();
 
         if (isMasterArray)
         {
-            // Just compute & store into masterArray
             UpdateMasterArray(targetCount, baseLocal, endLocal, dir, perp, arcTime, splineLength);
+
+            if (canGenerateTetheredArcs && spline != null && controller != null)
+            {
+                CopyMasterArrayToOwnSpline();
+            }
         }
         else
         {
             if (spline == null || controller == null)
-                return; // safety
+                return;
 
             AdjustPointCount(targetCount);
 
@@ -382,6 +560,8 @@ public class MagnetVectorRenderer : MonoBehaviour
                 float off = ComputeArcOffset(tNorm, arcTime);
                 p += perp * off;
 
+                p = ApplyExtraChaosNoise(p, dir, perp, tNorm, arcTime);
+
                 spline.SetPosition(i, p);
             }
 
@@ -394,12 +574,18 @@ public class MagnetVectorRenderer : MonoBehaviour
 
         lastMagnetActive = true;
 
-        bool show = !onlyShowWhenStopped || magnetIsStopped;
+        bool baseShow2 = IsStopDelayComplete();
+        bool finalShow2 = baseShow2 && burstVisible;
 
-        if (!isMasterArray && renderer2D != null)
-            renderer2D.enabled = show;
+        if (renderer2D != null)
+        {
+            if (isMasterArray)
+                renderer2D.enabled = canGenerateTetheredArcs && finalShow2;
+            else
+                renderer2D.enabled = finalShow2;
+        }
 
-        if (show)
+        if (finalShow2 && (!isMasterArray || canGenerateTetheredArcs))
         {
             UpdateSparks(baseLocal, endLocal);
             UpdateRandomSparks();
@@ -410,10 +596,22 @@ public class MagnetVectorRenderer : MonoBehaviour
             StopAllRandomSparks();
         }
 
+        if (justStopped)
+        {
+            PlayFlashFX(baseLocal, endLocal);
+            PlayGlowFX(baseLocal, endLocal);
+        }
+        else if (justStartedMoving)
+        {
+            StopGlowFX();
+        }
+
         lastSteppedArc = steppedArc;
+
+        UpdateAlphaWithDistanceFade();
     }
 
-    // ---------- CHILD: COPY FROM MASTER ARRAY (with partial segments + sharp) ----------
+    // ---------- CHILD: COPY FROM MASTER ARRAY (legacy + tethered) ----------
 
     private void UpdateFromMasterArray()
     {
@@ -424,6 +622,8 @@ public class MagnetVectorRenderer : MonoBehaviour
 
             UpdateSparks(null, null);
             StopAllRandomSparks();
+            tetherHasArc = false;
+            tetherHasMovingAnchor = false;
             return;
         }
 
@@ -435,14 +635,25 @@ public class MagnetVectorRenderer : MonoBehaviour
 
             UpdateSparks(null, null);
             StopAllRandomSparks();
+            tetherHasArc = false;
+            tetherHasMovingAnchor = false;
             return;
         }
 
-        // Mirror state flags from master (for visibility & sparks behavior).
+        // Mirror state flags from master.
         magnetMoving = masterArraySource.magnetMoving;
         magnetIsStopped = masterArraySource.magnetIsStopped;
 
-        // Make sure we have a spline to draw on.
+        if (magnetIsStopped && !lastStoppedFlag)
+        {
+            stoppedSinceTime = Time.time;
+        }
+        else if (!magnetIsStopped)
+        {
+            stoppedSinceTime = -1f;
+        }
+        lastStoppedFlag = magnetIsStopped;
+
         if (controller == null || spline == null)
         {
             controller = GetComponent<SpriteShapeController>();
@@ -456,15 +667,23 @@ public class MagnetVectorRenderer : MonoBehaviour
             Debug.LogWarning($"{name}: isChildToMasterArray is ON but no SpriteShapeController/Spline is available.");
             UpdateSparks(null, null);
             StopAllRandomSparks();
+            tetherHasArc = false;
+            tetherHasMovingAnchor = false;
+            return;
+        }
+
+        if (masterArraySource.canGenerateTetheredArcs)
+        {
+            UpdateTetheredChildFromMaster(arr);
             return;
         }
 
         float now = Time.time;
-        bool allowShow = !onlyShowWhenStopped || magnetIsStopped;
+        bool baseAllow = IsStopDelayComplete();
+        bool allowShow = baseAllow && burstVisible;
 
         if (!sharpChild)
         {
-            // Continuous copy: pick a fresh random segment each frame.
             if (!allowShow)
             {
                 if (renderer2D != null)
@@ -482,32 +701,24 @@ public class MagnetVectorRenderer : MonoBehaviour
             SelectRandomSegmentFromMaster(arr, out start, out segCount);
             CopySegmentToSpline(arr, start, segCount);
 
-            // Random sparks based on the child spline geometry
             UpdateRandomSparks();
         }
         else
         {
-            // Sharp: sample once, hold for lifetime, then hide until delay end, then resample.
             if (!childHasCachedSegment || now >= childDelayEndTime)
             {
                 int start, segCount;
                 SelectRandomSegmentFromMaster(arr, out start, out segCount);
                 CacheSegment(arr, start, segCount);
 
-                float minL = Mathf.Max(0.0001f, childLifetimeRange.x);
-                float maxL = Mathf.Max(minL, childLifetimeRange.y);
-                float life = Random.Range(minL, maxL);
+                float life = RandomRangeSafe(childLifetimeRange);
+                float delayTotal = RandomRangeSafe(childDelayRange);
 
-                float minD = Mathf.Max(0f, childDelayRange.x);
-                float maxD = Mathf.Max(minD, childDelayRange.y);
-                float delayTotal = Random.Range(minD, maxD);
-
-                // Ensure total delay is at least the visible lifetime
                 if (delayTotal < life)
                     delayTotal = life;
 
-                childLifeEndTime = now + life;        // visible until here
-                childDelayEndTime = now + delayTotal; // next resample at this time
+                childLifeEndTime = now + life;
+                childDelayEndTime = now + delayTotal;
             }
 
             bool visible = childHasCachedSegment &&
@@ -521,12 +732,10 @@ public class MagnetVectorRenderer : MonoBehaviour
 
                 CopyCachedSegmentToSpline();
 
-                // Random sparks only while visible
                 UpdateRandomSparks();
             }
             else
             {
-                // Hidden during the remainder of the delay window or while magnet moving.
                 if (renderer2D != null)
                     renderer2D.enabled = false;
 
@@ -535,6 +744,358 @@ public class MagnetVectorRenderer : MonoBehaviour
             }
         }
     }
+
+    // ---------- NEW: TETHERED CHILD ARCS + MOVEMENT ----------
+
+    private void UpdateTetheredChildFromMaster(MasterPoint[] arr)
+    {
+        float now = Time.time;
+        bool baseAllow = IsStopDelayComplete();
+        bool allowShow = baseAllow && burstVisible;
+
+        if (!allowShow)
+        {
+            tetherHasArc = false;
+            tetherHasMovingAnchor = false;
+
+            if (renderer2D != null)
+                renderer2D.enabled = false;
+
+            UpdateSparks(null, null);
+            StopAllRandomSparks();
+            return;
+        }
+
+        if (renderer2D == null)
+            renderer2D = GetComponent<SpriteShapeRenderer>();
+
+        if (spline == null && controller != null)
+            spline = controller.spline;
+
+        if (spline == null)
+        {
+            UpdateSparks(null, null);
+            StopAllRandomSparks();
+            tetherHasArc = false;
+            tetherHasMovingAnchor = false;
+            return;
+        }
+
+        if (tetherHasArc)
+        {
+            if (now >= tetherLifeEndTime)
+            {
+                tetherHasArc = false;
+                tetherHasMovingAnchor = false;
+                tetherNextSpawnTime = now + RandomRangeSafe(childDelayRange);
+
+                if (renderer2D != null)
+                    renderer2D.enabled = false;
+
+                UpdateSparks(null, null);
+                StopAllRandomSparks();
+                return;
+            }
+
+            int masterCount = arr.Length;
+            if (tetherAnchorMasterIndexA >= masterCount ||
+                tetherAnchorMasterIndexB >= masterCount)
+            {
+                tetherHasArc = false;
+                tetherHasMovingAnchor = false;
+                tetherNextSpawnTime = now;
+                if (renderer2D != null)
+                    renderer2D.enabled = false;
+                UpdateSparks(null, null);
+                StopAllRandomSparks();
+                return;
+            }
+
+            if (renderer2D != null)
+                renderer2D.enabled = true;
+
+            UpdateMovingAnchor(arr, now);
+
+            UpdateTetheredChildGeometry(arr, now);
+            UpdateRandomSparks();
+            return;
+        }
+
+        if (now < tetherNextSpawnTime)
+        {
+            if (renderer2D != null)
+                renderer2D.enabled = false;
+
+            UpdateSparks(null, null);
+            StopAllRandomSparks();
+            return;
+        }
+
+        if (!TrySpawnTetheredChild(arr, now))
+        {
+            tetherNextSpawnTime = now + RandomRangeSafe(childDelayRange);
+            if (renderer2D != null)
+                renderer2D.enabled = false;
+            UpdateSparks(null, null);
+            StopAllRandomSparks();
+            return;
+        }
+
+        if (renderer2D != null)
+            renderer2D.enabled = true;
+
+        UpdateTetheredChildGeometry(arr, now);
+        UpdateRandomSparks();
+    }
+
+    private bool TrySpawnTetheredChild(MasterPoint[] arr, float now)
+    {
+        int total = arr.Length;
+        if (total < 4)
+            return false;
+
+        int maxSpanIndices = total - 1;
+
+        float minFrac = Mathf.Clamp01(childCopyFractionRange.x);
+        float maxFrac = Mathf.Clamp01(childCopyFractionRange.y);
+        if (maxFrac < minFrac)
+        {
+            float tmp = minFrac;
+            minFrac = maxFrac;
+            maxFrac = tmp;
+        }
+
+        int minSpanIndices = 3;
+        float frac = Random.Range(minFrac, maxFrac);
+        int spanIndices = Mathf.RoundToInt(frac * maxSpanIndices);
+        spanIndices = Mathf.Clamp(spanIndices, minSpanIndices, maxSpanIndices);
+
+        int maxStart = maxSpanIndices - spanIndices;
+        if (maxStart < 0)
+            return false;
+
+        int ia = Random.Range(0, maxStart + 1);
+        int ib = ia + spanIndices;
+
+        if (ia > ib)
+        {
+            int tmp = ia;
+            ia = ib;
+            ib = tmp;
+        }
+        if (Mathf.Abs(ia - ib) < minSpanIndices)
+            return false;
+
+        int masterInteriorCount = ib - ia - 1;
+        int minInterior = Mathf.Max(2, masterInteriorCount);
+        int maxInterior = Mathf.Max(minInterior, childMaxExtraPoints);
+
+        int interiorCount = Random.Range(minInterior, maxInterior + 1);
+        int totalChildPoints = interiorCount + 2;
+
+        tetherAnchorMasterIndexA = ia;
+        tetherAnchorMasterIndexB = ib;
+        tetherChildPointCount = totalChildPoints;
+
+        AdjustPointCount(totalChildPoints);
+
+        Vector2 pa = arr[ia].position;
+        Vector2 pb = arr[ib].position;
+        Vector2 d = (pb - pa).normalized;
+        Vector2 perp = new Vector2(-d.y, d.x);
+        if (Random.value < 0.5f)
+            perp = -perp;
+
+        tetherPerpLocalDir = new Vector3(perp.x, perp.y, 0f);
+
+        float ampMin = Mathf.Max(0f, childArcAmplitudeRange.x);
+        float ampMax = Mathf.Max(ampMin, childArcAmplitudeRange.y);
+        tetherAmplitude = Random.Range(ampMin, ampMax);
+
+        float life = RandomRangeSafe(childLifetimeRange);
+        tetherLifeEndTime = now + life;
+
+        tetherHasArc = true;
+        tetherHasMovingAnchor = false;
+
+        if (enableMovement)
+        {
+            int lastIndex = total - 1;
+
+            bool moveA = Random.value < 0.5f;
+            tetherMovingAnchorIsA = moveA;
+
+            int idx = moveA ? tetherAnchorMasterIndexA : tetherAnchorMasterIndexB;
+
+            idx = Mathf.Clamp(idx, 0, lastIndex);
+            if (moveA)
+                tetherAnchorMasterIndexA = idx;
+            else
+                tetherAnchorMasterIndexB = idx;
+
+            int distToStart = idx;
+            int distToEnd   = lastIndex - idx;
+
+            tetherMovementDirection = (distToEnd < distToStart) ? +1 : -1;
+
+            int nextIndex = idx + tetherMovementDirection;
+
+            if (nextIndex <= 0 || nextIndex >= lastIndex)
+            {
+                tetherHasMovingAnchor = false;
+            }
+            else
+            {
+                tetherHasMovingAnchor = true;
+                float step = RandomRangeSafe(childAnchorStepTimeRange);
+                tetherNextMoveTime = now + step;
+            }
+        }
+
+        return true;
+    }
+
+    private void UpdateMovingAnchor(MasterPoint[] arr, float now)
+    {
+        if (!enableMovement || !tetherHasMovingAnchor)
+            return;
+
+        int masterCount = arr.Length;
+        if (masterCount < 2)
+        {
+            tetherHasMovingAnchor = false;
+            return;
+        }
+
+        int lastIndex = masterCount - 1;
+
+        if (now < tetherNextMoveTime)
+            return;
+
+        int idx = tetherMovingAnchorIsA ? tetherAnchorMasterIndexA : tetherAnchorMasterIndexB;
+
+        if (idx < 0) idx = 0;
+        if (idx > lastIndex) idx = lastIndex;
+
+        int nextIndex = idx + tetherMovementDirection;
+
+        if (nextIndex <= 0 || nextIndex >= lastIndex)
+        {
+            int clampedNext = Mathf.Clamp(nextIndex, 0, lastIndex);
+            if (tetherMovingAnchorIsA)
+                tetherAnchorMasterIndexA = clampedNext;
+            else
+                tetherAnchorMasterIndexB = clampedNext;
+
+            tetherHasMovingAnchor = false;
+            return;
+        }
+
+        idx = nextIndex;
+
+        if (tetherMovingAnchorIsA)
+            tetherAnchorMasterIndexA = idx;
+        else
+            tetherAnchorMasterIndexB = idx;
+
+        float step = RandomRangeSafe(childAnchorStepTimeRange);
+        tetherNextMoveTime = now + step;
+    }
+
+    private void UpdateTetheredChildGeometry(MasterPoint[] arr, float now)
+    {
+        if (spline == null) return;
+
+        int total = tetherChildPointCount;
+        AdjustPointCount(total);
+        if (total < 2) return;
+
+        int masterCount = arr.Length;
+        if (tetherAnchorMasterIndexA >= masterCount ||
+            tetherAnchorMasterIndexB >= masterCount)
+            return;
+
+        Vector3 aLocal = MasterIndexToLocal(arr, tetherAnchorMasterIndexA);
+        Vector3 bLocal = MasterIndexToLocal(arr, tetherAnchorMasterIndexB);
+
+        spline.SetPosition(0, aLocal);
+        spline.SetPosition(total - 1, bLocal);
+
+        Vector3 chord = bLocal - aLocal;
+        float length = chord.magnitude;
+        if (length < 0.0001f)
+            length = 0.0001f;
+        Vector3 dir = chord / length;
+
+        // splineLength here is the local segment length, but distance fade
+        // for children will use the master's splineLength via GetEffectiveSplineLength().
+        splineLength = length;
+
+        Vector3 jitterPerp = new Vector3(-dir.y, dir.x, 0f);
+
+        float arcTime = GetArcTime();
+
+        int interiorCount = total - 2;
+        for (int i = 1; i <= interiorCount; i++)
+        {
+            float tNorm = (float)i / (interiorCount + 1);
+            Vector3 p = Vector3.Lerp(aLocal, bLocal, tNorm);
+
+            float wave = Mathf.Sin(Mathf.PI * tNorm) * tetherAmplitude;
+            p += tetherPerpLocalDir * wave;
+
+            float off = ComputeArcOffset(tNorm, arcTime);
+            p += jitterPerp * off;
+
+            p = ApplyExtraChaosNoise(p, dir, jitterPerp, tNorm, arcTime);
+
+            spline.SetPosition(i, p);
+        }
+
+        ApplyMixedTangents(dir, length, arcTime);
+
+        if (total >= 2)
+        {
+            float segLen = length / (total - 1);
+            float baseHandle = Mathf.Min(dropInterval, segLen) * 0.5f;
+
+            Vector3 p0 = spline.GetPosition(0);
+            Vector3 p1 = spline.GetPosition(Mathf.Min(1, total - 1));
+            Vector3 plast = spline.GetPosition(total - 1);
+            Vector3 pBeforeLast = spline.GetPosition(Mathf.Max(0, total - 2));
+
+            Vector3 tan0 = (p1 - p0).normalized * baseHandle;
+            Vector3 tanLast = (pBeforeLast - plast).normalized * baseHandle;
+
+            spline.SetTangentMode(0, ShapeTangentMode.Continuous);
+            spline.SetLeftTangent(0, Vector3.zero);
+            spline.SetRightTangent(0, tan0);
+
+            spline.SetTangentMode(total - 1, ShapeTangentMode.Continuous);
+            spline.SetLeftTangent(total - 1, tanLast);
+            spline.SetRightTangent(total - 1, Vector3.zero);
+        }
+
+        controller.RefreshSpriteShape();
+
+        UpdateSparks(aLocal, bLocal);
+    }
+
+    private Vector3 MasterIndexToLocal(MasterPoint[] arr, int i)
+    {
+        i = Mathf.Clamp(i, 0, arr.Length - 1);
+        Vector2 p = arr[i].position;
+        return new Vector3(p.x, p.y, 0f);
+    }
+
+    private float RandomRangeSafe(Vector2 range)
+    {
+        float min = Mathf.Max(0f, range.x);
+        float max = Mathf.Max(min, range.y);
+        return Random.Range(min, max);
+    }
+
+    // ---------- legacy child segment helpers ----------
 
     private void SelectRandomSegmentFromMaster(MasterPoint[] arr, out int startIndex, out int segmentCount)
     {
@@ -549,7 +1110,6 @@ public class MagnetVectorRenderer : MonoBehaviour
             maxFrac = tmp;
         }
 
-        // pick a fraction, then derive a segment length
         float frac = Random.Range(minFrac, maxFrac);
         segmentCount = Mathf.RoundToInt(frac * total);
         segmentCount = Mathf.Clamp(segmentCount, 2, total);
@@ -580,6 +1140,8 @@ public class MagnetVectorRenderer : MonoBehaviour
         Vector3 baseLocal = new Vector3(arr[startIndex].position.x, arr[startIndex].position.y, 0f);
         Vector3 endLocal  = new Vector3(arr[startIndex + segmentCount - 1].position.x,
                                         arr[startIndex + segmentCount - 1].position.y, 0f);
+        splineLength = Vector3.Distance(baseLocal, endLocal);
+
         UpdateSparks(baseLocal, endLocal);
     }
 
@@ -630,6 +1192,8 @@ public class MagnetVectorRenderer : MonoBehaviour
         Vector3 baseLocal = new Vector3(childCachedSegment[0].position.x, childCachedSegment[0].position.y, 0f);
         Vector3 endLocal  = new Vector3(childCachedSegment[count - 1].position.x,
                                         childCachedSegment[count - 1].position.y, 0f);
+        splineLength = Vector3.Distance(baseLocal, endLocal);
+
         UpdateSparks(baseLocal, endLocal);
     }
 
@@ -751,6 +1315,32 @@ public class MagnetVectorRenderer : MonoBehaviour
         }
     }
 
+    private void CopyMasterArrayToOwnSpline()
+    {
+        if (masterArray == null || masterArray.Length < 2 || spline == null || controller == null)
+            return;
+
+        int count = masterArray.Length;
+        AdjustPointCount(count);
+
+        for (int i = 0; i < count; i++)
+        {
+            var mp = masterArray[i];
+            Vector3 p = new Vector3(mp.position.x, mp.position.y, 0f);
+
+            spline.SetPosition(i, p);
+            spline.SetTangentMode(i, mp.tangentMode);
+            spline.SetLeftTangent(i, new Vector3(mp.leftTangent.x, mp.leftTangent.y, 0f));
+            spline.SetRightTangent(i, new Vector3(mp.rightTangent.x, mp.rightTangent.y, 0f));
+        }
+
+        Vector3 first = new Vector3(masterArray[0].position.x, masterArray[0].position.y, 0f);
+        Vector3 last  = new Vector3(masterArray[count - 1].position.x, masterArray[count - 1].position.y, 0f);
+        splineLength = Vector3.Distance(first, last);
+
+        controller.RefreshSpriteShape();
+    }
+
     // ---------- Sparks at endpoints ----------
 
     private void UpdateSparks(Vector3? baseLocalOpt, Vector3? endLocalOpt)
@@ -811,6 +1401,66 @@ public class MagnetVectorRenderer : MonoBehaviour
         if (ps.isPlaying) ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
+    // ---------- Flash FX (one-shot on stop) ----------
+
+    private void PlayFlashFX(Vector3 baseLocal, Vector3 endLocal)
+    {
+        Vector3 baseWorld = transform.TransformPoint(baseLocal);
+        Vector3 endWorld  = transform.TransformPoint(endLocal);
+
+        if (baseFlash != null)
+        {
+            if (alignFlashToEndpoints)
+                baseFlash.transform.position = baseWorld;
+
+            baseFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            baseFlash.Play(true);
+        }
+
+        if (magnetFlash != null)
+        {
+            if (alignFlashToEndpoints)
+                magnetFlash.transform.position = endWorld;
+
+            magnetFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            magnetFlash.Play(true);
+        }
+    }
+
+    // ---------- Glow FX (loop while stopped) ----------
+
+    private void PlayGlowFX(Vector3 baseLocal, Vector3 endLocal)
+    {
+        Vector3 baseWorld = transform.TransformPoint(baseLocal);
+        Vector3 endWorld  = transform.TransformPoint(endLocal);
+
+        if (baseGlow != null)
+        {
+            if (alignGlowToEndpoints)
+                baseGlow.transform.position = baseWorld;
+
+            if (!baseGlow.isPlaying)
+                baseGlow.Play(true);
+        }
+
+        if (magnetGlow != null)
+        {
+            if (alignGlowToEndpoints)
+                magnetGlow.transform.position = endWorld;
+
+            if (!magnetGlow.isPlaying)
+                magnetGlow.Play(true);
+        }
+    }
+
+    private void StopGlowFX()
+    {
+        if (baseGlow != null)
+            baseGlow.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (magnetGlow != null)
+            magnetGlow.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+    }
+
     // ---------- Random Sparks Along Spline ----------
 
     private void InitRandomSparksPool()
@@ -822,20 +1472,16 @@ public class MagnetVectorRenderer : MonoBehaviour
         sparksPool = new ParticleSystem[sparksPoolSize];
         sparkEndTimes = new float[sparksPoolSize];
 
-        // Use the actual assigned particle system as pool[0]
         sparksPool[0] = sparks;
         sparkEndTimes[0] = 0f;
 
-        // Make sure it's parented to this arc (optional, but usually what we want)
         if (sparks.transform.parent != transform)
         {
             sparks.transform.SetParent(transform, true);
         }
 
-        // Ensure it's initially stopped
         sparks.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-        // Create clones for the rest
         for (int i = 1; i < sparksPoolSize; i++)
         {
             ParticleSystem clone = Instantiate(sparks, transform);
@@ -864,13 +1510,11 @@ public class MagnetVectorRenderer : MonoBehaviour
             return;
 
         int pointCount = spline.GetPointCount();
-        // need at least p0 and pLast plus one interior point
         if (pointCount <= 2)
             return;
 
         float now = Time.time;
 
-        // Clean up expired instances
         for (int i = 0; i < sparksPoolSize; i++)
         {
             var ps = sparksPool[i];
@@ -882,11 +1526,9 @@ public class MagnetVectorRenderer : MonoBehaviour
             }
         }
 
-        // Not time to spawn new sparks yet
         if (now < nextSparksTime)
             return;
 
-        // Schedule next interval
         float minInt = Mathf.Max(0.0001f, sparksIntervalRange.x);
         float maxInt = Mathf.Max(minInt, sparksIntervalRange.y);
         float interval = Random.Range(minInt, maxInt);
@@ -896,14 +1538,12 @@ public class MagnetVectorRenderer : MonoBehaviour
         if (interiorCount <= 0)
             return;
 
-        // How many interior points to use this batch
         int desiredCount = Mathf.RoundToInt(sparksDensity * interiorCount);
         if (desiredCount <= 0)
             return;
 
         desiredCount = Mathf.Min(desiredCount, sparksPoolSize);
 
-        // Choose unique random indices in [1, pointCount-2]
         List<int> chosenIndices = new List<int>(desiredCount);
         int safety = 0;
         while (chosenIndices.Count < desiredCount && safety < 1000)
@@ -950,7 +1590,6 @@ public class MagnetVectorRenderer : MonoBehaviour
             var ps = sparksPool[i];
             if (ps == null) continue;
 
-            // free if not playing or already past its end time
             if (!ps.isPlaying || now > sparkEndTimes[i])
                 return i;
         }
@@ -978,7 +1617,7 @@ public class MagnetVectorRenderer : MonoBehaviour
                 seedY + o * 10.0f
             );
 
-            n = (n - 0.5f) * 2f; // -1..1
+            n = (n - 0.5f) * 2f;
             sum += n * amp;
 
             amp *= arcRoughness;
@@ -986,6 +1625,25 @@ public class MagnetVectorRenderer : MonoBehaviour
         }
 
         return sum;
+    }
+
+    private Vector3 ApplyExtraChaosNoise(Vector3 position, Vector3 dir, Vector3 perp, float tNorm, float time)
+    {
+        if (!enableExtraChaos)
+            return position;
+
+        float chaosTime = time * extraChaosSpeed;
+        float seedBase = noiseSeed * 0.123f;
+        float u = tNorm * extraChaosFrequency + seedBase;
+
+        float nPerp = Mathf.PerlinNoise(u, chaosTime);
+        float nPar  = Mathf.PerlinNoise(u + 37.21f, chaosTime + 11.73f);
+
+        float jPerp = (nPerp - 0.5f) * 2f * extraChaosPerpJitter;
+        float jPar  = (nPar  - 0.5f) * 2f * extraChaosParallelJitter;
+
+        position += perp * jPerp + dir * jPar;
+        return position;
     }
 
     // ---------- Tangents on real spline ----------
@@ -1065,6 +1723,25 @@ public class MagnetVectorRenderer : MonoBehaviour
         return Mathf.Max(0, baseCount);
     }
 
+    // ----- stop-visibility delay helper -----
+
+    private bool IsStopDelayComplete()
+    {
+        if (!onlyShowWhenStopped)
+            return true;
+
+        if (!magnetIsStopped)
+            return false;
+
+        if (stopShowDelay <= 0f)
+            return true;
+
+        if (stoppedSinceTime < 0f)
+            return false;
+
+        return Time.time >= stoppedSinceTime + stopShowDelay;
+    }
+
     // ----- debounced movement / stop detection -----
 
     private void DetectMovingFlag()
@@ -1080,7 +1757,6 @@ public class MagnetVectorRenderer : MonoBehaviour
 
         Vector3 current = magnetTransform.position;
 
-        // First frame after we get a magnet: treat as MOVING, not stopped.
         if (!hasLastPos)
         {
             lastMagnetWorldPos = current;
@@ -1099,25 +1775,22 @@ public class MagnetVectorRenderer : MonoBehaviour
 
         if (aboveThreshold)
         {
-            // Definitely moving: reset "stopped" timer
             stoppedTimer = 0f;
             magnetMoving = true;
             magnetIsStopped = false;
+            hasMovedThisActivation = true;
         }
         else
         {
-            // Below movement threshold – maybe stopped, maybe just a quiet frame
             stoppedTimer += Time.deltaTime;
 
             if (stoppedTimer >= stoppedMinTime)
             {
-                // It's been quiet long enough: call it stopped
                 magnetMoving = false;
                 magnetIsStopped = true;
             }
             else
             {
-                // Not enough quiet time yet – still treat as moving
                 magnetMoving = true;
                 magnetIsStopped = false;
             }
@@ -1163,10 +1836,103 @@ public class MagnetVectorRenderer : MonoBehaviour
         controller.RefreshSpriteShape();
 
         desiredInteriorPoints = 0;
+        splineLength = 0f;
         magnetIsStopped = false;
         magnetMoving = false;
         stoppedTimer = 0f;
         hasLastPos = false;
+    }
+
+    // ----- MPB / Material init & update -----
+
+    public void InitializeMaterialForArc(Material baseMaterial)
+    {
+        if (renderer2D == null)
+            renderer2D = GetComponent<SpriteShapeRenderer>();
+
+        if (renderer2D == null)
+        {
+            Debug.LogWarning($"{name}: InitializeMaterialForArc called but no SpriteShapeRenderer found.");
+            return;
+        }
+
+        if (baseMaterial != null)
+            renderer2D.sharedMaterial = baseMaterial;
+
+        if (arcMPB == null)
+            arcMPB = new MaterialPropertyBlock();
+
+        baseArcAlpha = arcAlpha; // keep base aligned with whatever is set before this call
+
+        renderer2D.GetPropertyBlock(arcMPB);
+        arcMPB.SetFloat("_alpha", arcAlpha);
+        renderer2D.SetPropertyBlock(arcMPB);
+
+        hasArcMPB = true;
+        lastArcAlpha = arcAlpha;
+    }
+
+    // Manager-side helper for setting base alpha
+    public void SetBaseArcAlpha(float alpha)
+    {
+        baseArcAlpha = alpha;
+    }
+
+    // Effective length used for distance fade:
+    // - non-child: this.splineLength
+    // - child: parent's splineLength (master arc)
+    private float GetEffectiveSplineLength()
+    {
+        if (isChildToMasterArray && masterArraySource != null)
+        {
+            return Mathf.Max(0f, masterArraySource.splineLength);
+        }
+
+        return Mathf.Max(0f, splineLength);
+    }
+
+    private void ApplyDistanceFade()
+    {
+        // If no distance fade configured, just use base alpha.
+        if (maxSplineLength <= 0f)
+        {
+            arcAlpha = baseArcAlpha;
+            return;
+        }
+
+        float len = GetEffectiveSplineLength();
+        float t = Mathf.Clamp01(len / maxSplineLength); // 0 at 0 length, 1 at max
+        float fade = 1f - t;                            // 1 -> full alpha, 0 -> fully faded
+
+        arcAlpha = baseArcAlpha * fade;
+    }
+
+    private void UpdateAlphaOnMaterial()
+    {
+        if (!hasArcMPB || renderer2D == null)
+            return;
+
+        if (Mathf.Approximately(lastArcAlpha, arcAlpha))
+            return;
+
+        renderer2D.GetPropertyBlock(arcMPB);
+        arcMPB.SetFloat("_alpha", arcAlpha);
+        renderer2D.SetPropertyBlock(arcMPB);
+
+        lastArcAlpha = arcAlpha;
+    }
+
+    private void UpdateAlphaWithDistanceFade()
+    {
+        ApplyDistanceFade();
+        UpdateAlphaOnMaterial();
+    }
+
+    // ----- burst visibility control (called by manager) -----
+
+    public void SetBurstVisible(bool visible)
+    {
+        burstVisible = visible;
     }
 
     // ----- magnet / spawner lookup -----
