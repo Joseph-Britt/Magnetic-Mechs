@@ -85,6 +85,26 @@ public class MagnetVectorRenderer : MonoBehaviour
     [Tooltip("Particles at the magnet end.")]
     public Transform magnetSparks;
 
+    [Header("Flash FX (On Stop)")]
+    [Tooltip("One-shot flash at the player/base end when the magnet stops.")]
+    public ParticleSystem baseFlash;
+
+    [Tooltip("One-shot flash at the magnet end when the magnet stops.")]
+    public ParticleSystem magnetFlash;
+
+    [Tooltip("If true, flash systems will be snapped to the tether endpoints when they play.")]
+    public bool alignFlashToEndpoints = true;
+
+    [Header("Glow FX (Persistent While Stopped)")]
+    [Tooltip("Looping glow at the player/base end while the magnet remains stopped.")]
+    public ParticleSystem baseGlow;
+
+    [Tooltip("Looping glow at the magnet end while the magnet remains stopped.")]
+    public ParticleSystem magnetGlow;
+
+    [Tooltip("If true, glow systems will be snapped to the tether endpoints when they start playing.")]
+    public bool alignGlowToEndpoints = true;
+
     [Header("Master Array Mode")]
     [Tooltip("If ON, this script does all spline math but stores it in masterArray instead of writing to a SpriteShape.")]
     public bool isMasterArray = false;
@@ -180,6 +200,9 @@ public class MagnetVectorRenderer : MonoBehaviour
     [Tooltip("If ON, this arc (and child arcs) only render while the magnet is stopped (has hit the wall).")]
     public bool onlyShowWhenStopped = false;
 
+    [Tooltip("Extra delay after the magnet is considered stopped before this arc becomes visible (only used if onlyShowWhenStopped is true).")]
+    public float stopShowDelay = 0f;
+
     [Header("State Flags")]
     public bool magnetMoving;
     public bool magnetIsStopped;
@@ -192,9 +215,14 @@ public class MagnetVectorRenderer : MonoBehaviour
     private Vector3 lastMagnetWorldPos;
     private bool hasLastPos;
 
-    // cached particle systems (optional)
+    // cached endpoint sparks
     private ParticleSystem basePS;
     private ParticleSystem magnetPS;
+
+    // NEW: flash + glow + stop-delay state tracking
+    private bool hasMovedThisActivation; // has the magnet moved at least once this shot?
+    private bool lastStoppedFlag;        // magnetIsStopped from previous frame
+    private float stoppedSinceTime = -1f;
 
     // ----- stepped arc internals -----
     private bool lastSteppedArc;
@@ -297,6 +325,20 @@ public class MagnetVectorRenderer : MonoBehaviour
         tetherHasMovingAnchor = false;
         tetherNextSpawnTime = Time.time;
         tetherNextMoveTime = Time.time;
+
+        hasMovedThisActivation = false;
+        lastStoppedFlag = false;
+        stoppedSinceTime = -1f;
+
+        // Ensure flash & glow FX do NOT play on awake
+        if (baseFlash != null)
+            baseFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (magnetFlash != null)
+            magnetFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (baseGlow != null)
+            baseGlow.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (magnetGlow != null)
+            magnetGlow.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     void Update()
@@ -343,6 +385,13 @@ public class MagnetVectorRenderer : MonoBehaviour
 
             UpdateSparks(null, null);
             StopAllRandomSparks();
+
+            // reset stop-delay / flash / glow state
+            stoppedSinceTime = -1f;
+            hasMovedThisActivation = false;
+            lastStoppedFlag = false;
+            StopGlowFX();
+
             UpdateAlphaOnMaterial();
             return;
         }
@@ -355,12 +404,37 @@ public class MagnetVectorRenderer : MonoBehaviour
             {
                 UpdateSparks(null, null);
                 StopAllRandomSparks();
+                StopGlowFX();
                 UpdateAlphaOnMaterial();
                 return;
             }
         }
 
         DetectMovingFlag();
+
+        // Track when we became stopped (for visibility delay)
+        if (magnetIsStopped && !lastStoppedFlag)
+        {
+            stoppedSinceTime = Time.time;
+        }
+        else if (!magnetIsStopped)
+        {
+            stoppedSinceTime = -1f;
+        }
+
+        // Compute transitions for stop / moving
+        bool justStopped = false;
+        bool justStartedMoving = false;
+
+        if (magnetIsStopped && !lastStoppedFlag && hasMovedThisActivation)
+        {
+            justStopped = true;
+        }
+        if (!magnetIsStopped && lastStoppedFlag)
+        {
+            justStartedMoving = true;
+        }
+        lastStoppedFlag = magnetIsStopped;
 
         Transform baseT = baseTransform != null ? baseTransform : transform;
         Vector3 baseLocal = transform.InverseTransformPoint(baseT.position);
@@ -387,6 +461,12 @@ public class MagnetVectorRenderer : MonoBehaviour
 
             UpdateSparks(null, null);
             StopAllRandomSparks();
+
+            stoppedSinceTime = -1f;
+            hasMovedThisActivation = false;
+            lastStoppedFlag = false;
+            StopGlowFX();
+
             UpdateAlphaOnMaterial();
             return;
         }
@@ -404,7 +484,7 @@ public class MagnetVectorRenderer : MonoBehaviour
             steppedInitialized = false;
             lastSteppedArc = steppedArc;
 
-            bool baseShow = !onlyShowWhenStopped || magnetIsStopped;
+            bool baseShow = IsStopDelayComplete();
             bool finalShow = baseShow && burstVisible;
 
             if (renderer2D != null)
@@ -424,6 +504,17 @@ public class MagnetVectorRenderer : MonoBehaviour
             {
                 UpdateSparks(null, null);
                 StopAllRandomSparks();
+            }
+
+            // Trigger flash + glow at stop (no visibility delay)
+            if (justStopped)
+            {
+                PlayFlashFX(baseLocal, endLocal);
+                PlayGlowFX(baseLocal, endLocal);
+            }
+            else if (justStartedMoving)
+            {
+                StopGlowFX();
             }
 
             UpdateAlphaOnMaterial();
@@ -483,7 +574,7 @@ public class MagnetVectorRenderer : MonoBehaviour
 
         lastMagnetActive = true;
 
-        bool baseShow2 = !onlyShowWhenStopped || magnetIsStopped;
+        bool baseShow2 = IsStopDelayComplete();
         bool finalShow2 = baseShow2 && burstVisible;
 
         if (renderer2D != null)
@@ -503,6 +594,17 @@ public class MagnetVectorRenderer : MonoBehaviour
         {
             UpdateSparks(null, null);
             StopAllRandomSparks();
+        }
+
+        // Play flash + start glow at the moment we detect stop
+        if (justStopped)
+        {
+            PlayFlashFX(baseLocal, endLocal);
+            PlayGlowFX(baseLocal, endLocal);
+        }
+        else if (justStartedMoving)
+        {
+            StopGlowFX();
         }
 
         lastSteppedArc = steppedArc;
@@ -544,6 +646,17 @@ public class MagnetVectorRenderer : MonoBehaviour
         magnetMoving = masterArraySource.magnetMoving;
         magnetIsStopped = masterArraySource.magnetIsStopped;
 
+        // Track stop time for delay on child too
+        if (magnetIsStopped && !lastStoppedFlag)
+        {
+            stoppedSinceTime = Time.time;
+        }
+        else if (!magnetIsStopped)
+        {
+            stoppedSinceTime = -1f;
+        }
+        lastStoppedFlag = magnetIsStopped;
+
         // Make sure we have a spline to draw on.
         if (controller == null || spline == null)
         {
@@ -572,7 +685,7 @@ public class MagnetVectorRenderer : MonoBehaviour
 
         // Otherwise, legacy behavior (segment copy / sharpChild).
         float now = Time.time;
-        bool baseAllow = !onlyShowWhenStopped || magnetIsStopped;
+        bool baseAllow = IsStopDelayComplete();
         bool allowShow = baseAllow && burstVisible;
 
         if (!sharpChild)
@@ -649,7 +762,7 @@ public class MagnetVectorRenderer : MonoBehaviour
     private void UpdateTetheredChildFromMaster(MasterPoint[] arr)
     {
         float now = Time.time;
-        bool baseAllow = !onlyShowWhenStopped || magnetIsStopped;
+        bool baseAllow = IsStopDelayComplete();
         bool allowShow = baseAllow && burstVisible;
 
         if (!allowShow)
@@ -886,7 +999,7 @@ public class MagnetVectorRenderer : MonoBehaviour
 
         int nextIndex = idx + tetherMovementDirection;
 
-        if (nextIndex <= 0 || nextIndex >= lastIndex)
+               if (nextIndex <= 0 || nextIndex >= lastIndex)
         {
             int clampedNext = Mathf.Clamp(nextIndex, 0, lastIndex);
             if (tetherMovingAnchorIsA)
@@ -1301,6 +1414,66 @@ public class MagnetVectorRenderer : MonoBehaviour
         if (ps.isPlaying) ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
+    // ---------- Flash FX (one-shot on stop) ----------
+
+    private void PlayFlashFX(Vector3 baseLocal, Vector3 endLocal)
+    {
+        Vector3 baseWorld = transform.TransformPoint(baseLocal);
+        Vector3 endWorld  = transform.TransformPoint(endLocal);
+
+        if (baseFlash != null)
+        {
+            if (alignFlashToEndpoints)
+                baseFlash.transform.position = baseWorld;
+
+            baseFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            baseFlash.Play(true);
+        }
+
+        if (magnetFlash != null)
+        {
+            if (alignFlashToEndpoints)
+                magnetFlash.transform.position = endWorld;
+
+            magnetFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            magnetFlash.Play(true);
+        }
+    }
+
+    // ---------- Glow FX (loop while stopped) ----------
+
+    private void PlayGlowFX(Vector3 baseLocal, Vector3 endLocal)
+    {
+        Vector3 baseWorld = transform.TransformPoint(baseLocal);
+        Vector3 endWorld  = transform.TransformPoint(endLocal);
+
+        if (baseGlow != null)
+        {
+            if (alignGlowToEndpoints)
+                baseGlow.transform.position = baseWorld;
+
+            if (!baseGlow.isPlaying)
+                baseGlow.Play(true);
+        }
+
+        if (magnetGlow != null)
+        {
+            if (alignGlowToEndpoints)
+                magnetGlow.transform.position = endWorld;
+
+            if (!magnetGlow.isPlaying)
+                magnetGlow.Play(true);
+        }
+    }
+
+    private void StopGlowFX()
+    {
+        if (baseGlow != null)
+            baseGlow.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (magnetGlow != null)
+            magnetGlow.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+    }
+
     // ---------- Random Sparks Along Spline ----------
 
     private void InitRandomSparksPool()
@@ -1563,6 +1736,30 @@ public class MagnetVectorRenderer : MonoBehaviour
         return Mathf.Max(0, baseCount);
     }
 
+    // ----- stop-visibility delay helper -----
+
+    private bool IsStopDelayComplete()
+    {
+        // If "only show when stopped" is off, always visible.
+        if (!onlyShowWhenStopped)
+            return true;
+
+        // If we're not actually stopped, we can't show yet.
+        if (!magnetIsStopped)
+            return false;
+
+        // No extra delay configured.
+               if (stopShowDelay <= 0f)
+            return true;
+
+        // Haven't recorded when we stopped yet.
+        if (stoppedSinceTime < 0f)
+            return false;
+
+        // Wait until (stoppedSinceTime + delay).
+        return Time.time >= stoppedSinceTime + stopShowDelay;
+    }
+
     // ----- debounced movement / stop detection -----
 
     private void DetectMovingFlag()
@@ -1599,6 +1796,9 @@ public class MagnetVectorRenderer : MonoBehaviour
             stoppedTimer = 0f;
             magnetMoving = true;
             magnetIsStopped = false;
+
+            // We've seen real movement during this activation
+            hasMovedThisActivation = true;
         }
         else
         {
