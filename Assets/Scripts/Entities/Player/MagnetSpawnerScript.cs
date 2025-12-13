@@ -7,7 +7,7 @@ public class MagnetSpawnerScript : MonoBehaviour
 {
     //script for launching the magnet from the player
     private float LaunchForce = 35f;
-    public float reloadTime = 1f;
+    private float reloadTime = .6f;
     private float timer;
     private bool magnetDisabled = false;
     public GameObject myMagnet;

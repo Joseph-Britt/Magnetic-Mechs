@@ -35,6 +35,9 @@ public class PlayerScript : MonoBehaviour
     [Header("Timers")]
     private float remainingFuelTimer = 0;
     private float remainingFuelTimeToDisappear = .5f;
+    private float inGroundTimer = 0f;
+    private float inGroundKillTime = .15f;
+
     [Header("Drag Values")]
     private float defaultDrag = .05f;
     private float clampXDrag = 2.5f;
@@ -984,8 +987,10 @@ public class PlayerScript : MonoBehaviour
         bool inGround= (Physics2D.Raycast(transform.position - distanceToLeg/2 + inGroundOffset, Vector2.down, groundLength, inGroundLayer) || Physics2D.Raycast(transform.position + distanceToLeg / 2 + inGroundOffset, Vector2.down, groundLength, inGroundLayer));
         if (inGround)
         {
-            healthScript.HandlePlayerDeath();
+            inGroundTimer += Time.deltaTime;
+            if(inGroundTimer >= inGroundKillTime) healthScript.HandlePlayerDeath();
         }
+        else inGroundTimer = 0;
     }
     private void OnDrawGizmos()
     {
