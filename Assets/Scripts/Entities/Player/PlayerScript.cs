@@ -10,6 +10,7 @@ using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
+
     //main script for managing the player
     [Header("Components")]
     public Rigidbody2D myRigidbody2D;
@@ -18,30 +19,26 @@ public class PlayerScript : MonoBehaviour
     public PlayerHealthScript healthScript;
     public AudioSource jumpSound;
     public CutsceneManager cutsceneManagerScript;
-    public PlankScript handlePlanks;
     public MultiSceneVariables savedVariables;
     public PlayerInput myInput;
     public GameObject pointerArrow;
     public LogicScript logic;
-    public Image remainingFuelImage;
-    public GameObject remainingFuelParent;
+
     public MagnetVisualEffectScript magnetVisualEffectScript;
     public GameObject DeathAnimation;
-    
+    [Header("Scripts")]
+    public PlayerPhysicsScript myPlayerPhysicsScript;
+    public VerticalMovementScript myVerticalMovementScript;
+
     [Header("Logic")]
     private bool playerAlive = true;
     public bool gamePadNotMouse = false;
 
-    [Header("Timers")]
-    private float remainingFuelTimer = 0;
-    private float remainingFuelTimeToDisappear = .5f;
-    private float inGroundTimer = 0f;
-    private float inGroundKillTime = .15f;
 
-    [Header("Drag Values")]
-    private float defaultDrag = .05f;
-    private float clampXDrag = 2.5f;
-    private float clampYDrag = 3.0f;
+    [Header("Inputs")]
+    public bool jumpPressed;
+    private bool jetpackOn;
+
 
     [Header("Horizontal Movement")]
     public float direction;
@@ -53,33 +50,16 @@ public class PlayerScript : MonoBehaviour
 
     [Header("Vertical Movement")]
     public float verticalDirection;
-    private float maxYSpeed = 20f;
 
-    [Header("Handle Hits")]
+    [Header("To Health")]
     private float knockbackTime = 0.25f;
     const float invincibilityTimeDefault = .5f;
-
-
-    [Header("Collision")]
-    public bool onGround = false;
-    public bool overlappingGround = false;
-    public bool trulyOnGround = false;
-    public bool nearGround = false;
-    private float groundLength = .9f;
-    private float nearGroundLength = 1.25f;
-    private float legLength = .78f;
-    private Vector3 distanceToLeg = new Vector3(.42f, 0, 0);
-    private Vector3 inGroundOffset = new Vector3(0, .25f,0);
-    public LayerMask groundLayer;
+    private float inGroundTimer = 0f;
+    private float inGroundKillTime = .15f;
     public LayerMask inGroundLayer;
+    private Vector3 inGroundOffset = new Vector3(0, .25f, 0);
 
-    [Header("Jumping")]
-    public bool jumpPressed = false;
-    public float jumpTimer;
-    private float jumpDelay = .15f;
-    public float maxYSpeedTimer;
-    private float maxYSpeedDelay = .7f;
-    private float jumpForce = 7f;
+
 
     [Header("Charging")]
     public bool chargePressed = false;
@@ -94,28 +74,10 @@ public class PlayerScript : MonoBehaviour
     public Sprite chargeCooldownIndicatorImage;
     public SpriteRenderer chargeIndicator;
 
-    [Header("Jetpack")]
-    private float jetpackTotalTime = 1.2f;
-    public float jetpackCurrentTime = 0f;
-    private float jetPackForce = 12f;
-    private float maxJetSpeed = 19f;
-    private float jetpackRecoveryTimer = 0f;
-    private float jetpackRecoveryTime = 0.25f;
-    private float jetPackTimeRecoveryMultiplier = .85f;
-    private float slowSpeedMultiplyer = 1.4f;
-    private bool jetpackOn;
-    public AudioSource jetpackAudio;
 
-    [Header("Jetpack Components")]
-    public GameObject jetpackLower;
-    //public GameObject jetpackLowerRight;
-    public GameObject jetpackBackwards;
-    public bool jetpackBackwardsOn;
+
 
     [Header("Physics")]
-    private float linearDrag = 3f;
-    public float gravity = 1f;
-    private float fallMultiplier = 3f;
     public bool repelOn = false;
     public bool attractButtonHeld = false;
     public bool attractOn = false;
@@ -140,10 +102,6 @@ public class PlayerScript : MonoBehaviour
     private GameObject myMagnet;
     private Vector2 magnetRelativePosition;
     private float magnetDistance;
-
-    [Header("Dust Effects")]
-    public ParticleSystem changeDirectionDust;
-    public ParticleSystem DashingDust;
 
     [Header("Magnet")]
     private float magnetDistanceMultiplyingForceRepulsion = 98;
@@ -192,9 +150,8 @@ public class PlayerScript : MonoBehaviour
         bulletSpawnerScript = BulletSpawner.GetComponent<BulletSpawnerScript>();
         MagnetSpawner = GameObject.FindGameObjectWithTag("MagnetSpawner");
         magnetSpawnerScript = MagnetSpawner.GetComponent<MagnetSpawnerScript>();
-        groundLayer = LayerMask.GetMask("Ground","Plank Ground");
         inGroundLayer = LayerMask.GetMask("Ground");
-        jetpackCurrentTime = jetpackTotalTime;
+        
     }
 
     private void Start() {
@@ -219,75 +176,10 @@ public class PlayerScript : MonoBehaviour
             return;
         }
         mousePosition = virtualCamera.ScreenToWorldPoint(Input.mousePosition);//orientation
-        if (verticalDirection <= -.25f && handlePlanks != null)
-            {
-            groundLayer = LayerMask.GetMask("Ground");
-            handlePlanks.disablePlanks();
-        }
-        else
-        {
-            {
-                groundLayer = LayerMask.GetMask("Ground", "Plank Ground");
-            }
-        }
-        onGround = (Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, groundLength, groundLayer));
-        overlappingGround = (Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, legLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, legLength, groundLayer));
-        trulyOnGround = onGround && !overlappingGround;
-        nearGround = Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, nearGroundLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, nearGroundLength, groundLayer) && !overlappingGround;
-        if (playerAlive)
-        {
-            //playerAnimationManagerScript.setLanding(trulyOnGround, onGround, myRigidbody2D.linearVelocity.y);
-            playerAnimationManagerScript.setLanding(nearGround);
-        }
-        //Method One Recover on Ground
-        if (trulyOnGround)
-        {
-            jetpackCurrentTime = jetpackTotalTime;
-            handleJetPackTime();
-        }
-        jetpackOn = jumpPressed && (!trulyOnGround);
-        if (jetpackOn)
-        {
-            if (jetpackCurrentTime <= 0)
-            {
-                jetpackOn = false;
-            }
-            else
-            {
-                jetpackCurrentTime -= Time.deltaTime;
-                jetpackRecoveryTimer = 0f;
-                handleJetPackTime();
-            }
-        }
-        //Method Two Recover whenever jetpack isn't in use
-        if (!jetpackOn && jetpackCurrentTime < jetpackTotalTime)
-        {
-            jetpackRecoveryTimer += Time.deltaTime;
-            if (jetpackRecoveryTimer > jetpackRecoveryTime)
-            {
-                jetpackCurrentTime += Time.deltaTime * 1.4f;
-            }
-            handleJetPackTime() ;
-        }
-        if (jumpPressed)
-        {
-            jumpTimer = Time.time + jumpDelay;
-            if (trulyOnGround)
-            {
-                maxYSpeedTimer = Time.time + maxYSpeedDelay;
-            }
-        }
-        if (jetpackAudio!= null) 
-        {
-            if (jetpackOn)
-            {
-                if(!jetpackAudio.isPlaying) jetpackAudio.Play();
-            }
-            else
-            {
-                jetpackAudio.Stop();
-            }
-        }
+        //Vertical
+        jetpackOn = myVerticalMovementScript.handleVerticalUpdates(verticalDirection, playerAlive, jumpPressed);
+        myVerticalMovementScript.SetJetpackSprites(direction);
+        //Magnet
         if (magnetAttractionAudio != null && magnetRepulsionAudio != null)
         {
             if (repelOn ^ attractOn)
@@ -316,11 +208,6 @@ public class PlayerScript : MonoBehaviour
             magnetSpawnerScript.Launch();
             launchMagnet = false;
         }
-        jetpackLower.GetComponent<JetpackScript>().setJetpack(jetpackOn);
-        //jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(jetpackOn);
-        jetpackBackwardsOn = !trulyOnGround && Mathf.Abs(direction) > 0;
-        jetpackBackwards.GetComponent<JetpackScript>().setJetpack(jetpackBackwardsOn);
-        //jumpPressed = false;
 
         //Experiment
         if (checkMovementInput) {
@@ -340,11 +227,11 @@ public class PlayerScript : MonoBehaviour
             return;
         }
         UpdatePlatformFriction();
-        modifyPhysics(jetpackOn);
+        myPlayerPhysicsScript.modifyPhysics(jetpackOn, direction, myVerticalMovementScript.returnTrulyOnGround());
         handleHorizontalMovement();
-        handleVerticalMovement();
+        myVerticalMovementScript.handleVerticalMovement();
+        myVerticalMovementScript.handleRemainingFuelBar();
         handleMagneticRepulsion();
-        handleRemainingFuelBar();
         handleCharging();
         CheckIfStuckInGround();
     }
@@ -401,27 +288,12 @@ public class PlayerScript : MonoBehaviour
 
         return recentMove || recentJump || recentMagnet;
     }
-    private bool IsOnMovingPlatform(out Rigidbody2D platformRb)
-    {
-        platformRb = null;
-        RaycastHit2D hitLeft = Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, groundLength, groundLayer);
-        RaycastHit2D hitRight = Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, groundLength, groundLayer);
-        RaycastHit2D[] hits = { hitLeft, hitRight };
-        foreach (RaycastHit2D hit in hits)
-        {
-            if (hit.collider != null && hit.collider.CompareTag("MovingPlatform"))
-            {
-                platformRb = hit.collider.attachedRigidbody;
-                return true;
-            }
-        }
-        return false;
-    }
+
     private float currentFriction = 0f;
     private void UpdatePlatformFriction() {
         if (myRigidbody2D == null) return;
         Rigidbody2D platformRb;
-        bool onMovingPlatform = IsOnMovingPlatform(out platformRb);
+        bool onMovingPlatform = myVerticalMovementScript.IsOnMovingPlatform(out platformRb);
         
         
         bool playerInteracting = HasRecentInput();
@@ -503,44 +375,15 @@ public class PlayerScript : MonoBehaviour
                 }
             }
         }
-        if (MathF.Abs(myRigidbody2D.linearVelocity.x) > currentMaxSpeed && myRigidbody2D.linearDamping < clampXDrag)
-        {
-            //myRigidbody2D.velocity = new Vector2(MathF.Sign(myRigidbody2D.velocity.x) * currentMaxSpeed, myRigidbody2D.velocity.y);
-            myRigidbody2D.linearDamping = clampXDrag;
-        }
+        myPlayerPhysicsScript.ApplyMaxHorizontalSpeedDrag(currentMaxSpeed);
     }
-    void adjustMaxYSpeed()
-    {
-        //turns on damping if the player is above a certain y speed
-        float currentMaxSpeed = maxYSpeed;
-        if (repelOn ^ attractOn)
-        {
-            if (myMagnet != null && magnetSpawnerScript.magnetActive)
-            {
-                Vector2 magnetRelativePosition = transform.position - myMagnet.transform.position;
-                float magnetDistance = magnetRelativePosition.magnitude;
-                if (magnetDistance < (maximumMagnetDistance))
-                {
-                    float angle = Mathf.Atan2(magnetRelativePosition.y, magnetRelativePosition.x);
-                    float sinAngle = Mathf.Sin(angle);
-                    float sign = MathF.Abs(myRigidbody2D.linearVelocity.y) / myRigidbody2D.linearVelocity.y;
-                    if (attractOn) sign *= -1;//if attract is on then we want the + in the next step to be a minus
-                    currentMaxSpeed = maxYSpeed * MathF.Abs(sign + 4 * sinAngle * MathF.Sqrt((maximumMagnetDistance - magnetDistance) / maximumMagnetDistance));
-                }
-            }
-        }
-        if (MathF.Abs(myRigidbody2D.linearVelocity.y) > currentMaxSpeed && myRigidbody2D.linearDamping < clampYDrag)
-        {
-            //myRigidbody2D.velocity = new Vector2(myRigidbody2D.velocity.x, MathF.Sign(myRigidbody2D.velocity.y) * currentMaxSpeed);
-            myRigidbody2D.linearDamping = clampYDrag;
-        }
-    }
+    
     private void Flip()
     {
         facingRight = !facingRight;
         playerAnimationManagerScript.flipLegs(facingRight);
         //transform.rotation = Quaternion.Euler(0, facingRight ? 0 : 180, 0);
-        remainingFuelImage.transform.rotation = Quaternion.Euler(0, 0, 0);
+        myVerticalMovementScript.remainingFuelImage.transform.rotation = Quaternion.Euler(0, 0, 0);
     }
     public void DisableMovement()
     {
@@ -552,42 +395,6 @@ public class PlayerScript : MonoBehaviour
     public void EnableMovement()
     {
         movementDisabled = false;
-    }
-    void handleVerticalMovement()
-    {
-        //handles checks and related to vertical movement once every Update cycle
-        if (trulyOnGround && jumpTimer > Time.time)
-        {
-            jump();
-        }
-        if (!trulyOnGround && jetpackOn)
-        {
-            float currentJetPackForce = jetPackForce;
-            if(myRigidbody2D.linearVelocity.y < 5)
-            {
-                currentJetPackForce *= slowSpeedMultiplyer;
-            }
-            myRigidbody2D.AddForce(new Vector2(0, currentJetPackForce));
-
-            if (myRigidbody2D.linearVelocity.y > maxJetSpeed && maxYSpeedTimer < Time.time)
-            {
-                if (repelOn || attractOn)
-                {
-                    return;
-                }
-                if (myRigidbody2D.linearDamping < clampYDrag) myRigidbody2D.linearDamping = clampYDrag/2;
-                //myRigidbody2D.velocity = new Vector2(myRigidbody2D.velocity.x, maxJetSpeed);
-            }
-        }
-        adjustMaxYSpeed();
-    }
-    private void jump()
-    {
-        myRigidbody2D.linearVelocity = new Vector2(myRigidbody2D.linearVelocity.x, 0);
-        myRigidbody2D.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
-        //jumpSound.Play();
-        //Instantiate(JumpDust, new Vector3(transform.position.x, transform.position.y - groundLength * 3 / 4, transform.position.z), transform.rotation);
-        jumpTimer = 0;
     }
     private void handleGunOrientation()
     {
@@ -605,51 +412,7 @@ public class PlayerScript : MonoBehaviour
             playerAnimationManagerScript.setFiringAngle(Mathf.Atan2(mouseRelativePosition.y, mouseRelativePosition.x) * Mathf.Rad2Deg);
         }
     }
-    private void modifyPhysics(bool jetpackOn)
-    {
-        bool changingDirection = (direction > 0 && myRigidbody2D.linearVelocity.x < 0) || (direction < 0 && myRigidbody2D.linearVelocity.x > 0);
-        if (trulyOnGround)
-        {
-            myRigidbody2D.gravityScale = 0;
-            if (MathF.Abs(direction) == 0f || changingDirection)
-            {
-                myRigidbody2D.linearDamping = linearDrag * 2.5f;
-                if (changingDirection)
-                {
-                    CreateDust();
-                }
-            }
-            else
-            {
-                myRigidbody2D.linearDamping = defaultDrag;
-            }
-        }
-        else
-        {
-            myRigidbody2D.gravityScale = gravity;
-            myRigidbody2D.linearDamping = linearDrag * .15f;
-            if (jetpackOn)
-            {
-                myRigidbody2D.gravityScale = gravity / 2;
-            }
-            if (myRigidbody2D.linearVelocity.y < 0f)
-            {
-                if (jetpackOn)
-                {
-                    myRigidbody2D.linearDamping = linearDrag;
-                }
-                else
-                {
-                    myRigidbody2D.gravityScale = gravity * fallMultiplier;
-                }
-            }
-            else if (myRigidbody2D.linearVelocity.y > 0f && !jetpackOn)
-            {
-                myRigidbody2D.gravityScale = gravity * fallMultiplier / 2;
-            }
-
-        }
-    }
+    
 
     private void handleCharging()
     {
@@ -695,11 +458,6 @@ public class PlayerScript : MonoBehaviour
 
         chargeTimer -= Time.deltaTime;
         chargeCooldownTimer -= Time.deltaTime;
-    }
-
-    private void CreateDust()
-    {
-        changeDirectionDust.Play();
     }
     public void DamagePlayer(float Damage, Vector2 knockbackDirection, float knockback = 0, float invincibilityTime = invincibilityTimeDefault)
     {
@@ -789,31 +547,7 @@ public class PlayerScript : MonoBehaviour
         //movementEnabled = true;
         playerAnimationManagerScript.setAllSpritesColor(Color.white);
     }
-    public void handleJetPackTime()
-    {
-        int remainingFuelPercent = (int)(100 * jetpackCurrentTime / jetpackTotalTime);
-        if (remainingFuelPercent < 0)
-        {
-            remainingFuelPercent = 0;
-        }
-        remainingFuelImage.fillAmount = remainingFuelPercent / 100.0f;
-    }
-    public void handleRemainingFuelBar()
-    {
-        if (jetpackCurrentTime >= jetpackTotalTime)
-        {
-            remainingFuelTimer += Time.deltaTime * jetPackTimeRecoveryMultiplier;
-            if (remainingFuelTimer > remainingFuelTimeToDisappear)
-            {
-                remainingFuelParent.SetActive(false);
-            }
-        }
-        else
-        {
-            remainingFuelParent.SetActive(true);
-            remainingFuelTimer = 0;
-        }
-    }
+
     private void handleMagneticRepulsion()
     {
         if (myMagnet == null || !(repelOn ^ attractOn) || !magnetSpawnerScript.magnetActive) return;
@@ -846,6 +580,27 @@ public class PlayerScript : MonoBehaviour
         }
         myRigidbody2D.AddForce(forceDirection * forceMagnitude, ForceMode2D.Force);
     }
+    public float getMagnetMaxYSpeed(float maxYSpeed)
+    {
+        float currentMaxSpeed = maxYSpeed;
+        if (repelOn ^ attractOn)
+        {
+            if (myMagnet != null && magnetSpawnerScript.magnetActive)
+            {
+                Vector2 magnetRelativePosition = transform.position - myMagnet.transform.position;
+                float magnetDistance = magnetRelativePosition.magnitude;
+                if (magnetDistance < (maximumMagnetDistance))
+                {
+                    float angle = Mathf.Atan2(magnetRelativePosition.y, magnetRelativePosition.x);
+                    float sinAngle = Mathf.Sin(angle);
+                    float sign = MathF.Abs(myRigidbody2D.linearVelocity.y) / myRigidbody2D.linearVelocity.y;
+                    if (attractOn) sign *= -1;//if attract is on then we want the + in the next step to be a minus
+                    currentMaxSpeed = maxYSpeed * MathF.Abs(sign + 4 * sinAngle * MathF.Sqrt((maximumMagnetDistance - magnetDistance) / maximumMagnetDistance));
+                }
+            }
+        }
+        return currentMaxSpeed;
+    }
     public void KillPlayer()
     {
         if (!playerAlive)
@@ -862,10 +617,7 @@ public class PlayerScript : MonoBehaviour
         chargeIndicator.sprite = null;
         if (magnetAttractionAudio != null && magnetAttractionAudio.isPlaying) magnetAttractionAudio.Stop();
         if (magnetRepulsionAudio != null && magnetRepulsionAudio.isPlaying) magnetRepulsionAudio.Stop();
-        if (jetpackAudio != null && jetpackAudio.isPlaying) jetpackAudio.Stop();
-        jetpackLower.GetComponent<JetpackScript>().setJetpack(false);
-        //jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(false);
-        jetpackBackwards.GetComponent<JetpackScript>().setJetpack(false);
+        myVerticalMovementScript.PlayerKilled();
         StartCoroutine(HandleDeath());
     }
     IEnumerator HandleDeath()
@@ -984,18 +736,12 @@ public class PlayerScript : MonoBehaviour
     }
     public void CheckIfStuckInGround()
     {
-        bool inGround= (Physics2D.Raycast(transform.position - distanceToLeg/2 + inGroundOffset, Vector2.down, groundLength, inGroundLayer) || Physics2D.Raycast(transform.position + distanceToLeg / 2 + inGroundOffset, Vector2.down, groundLength, inGroundLayer));
+        bool inGround= (Physics2D.Raycast(transform.position - myVerticalMovementScript.getDistanceToLeg()/2 + inGroundOffset, Vector2.down, myVerticalMovementScript.getGroundLength(), inGroundLayer) || Physics2D.Raycast(transform.position + myVerticalMovementScript.getDistanceToLeg() / 2 + inGroundOffset, Vector2.down, myVerticalMovementScript.getGroundLength(), inGroundLayer));
         if (inGround)
         {
             inGroundTimer += Time.deltaTime;
             if(inGroundTimer >= inGroundKillTime) healthScript.HandlePlayerDeath();
         }
         else inGroundTimer = 0;
-    }
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position - distanceToLeg, transform.position - distanceToLeg + Vector3.down * legLength);
-        Gizmos.DrawLine(transform.position + distanceToLeg, transform.position + distanceToLeg + Vector3.down * groundLength);
     }
 }
