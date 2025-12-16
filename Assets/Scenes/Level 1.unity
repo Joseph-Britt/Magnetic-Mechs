@@ -7532,7 +7532,7 @@ MonoBehaviour:
   logic: {fileID: 0}
   player: {fileID: 0}
   playerScript: {fileID: 0}
-  pilotsDeath: {fileID: 0}
+  pilotsDeath: {fileID: 1449059811}
   firstDialogueToTrigger: {fileID: 1784416423}
   shootingPromptScript: {fileID: 0}
 --- !u!4 &780516861
@@ -78448,6 +78448,11 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 5.9924927, y: 0.4375763}
   m_EdgeRadius: 0
+--- !u!1 &1449059811 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6259162781507525677, guid: 3cdd95d7e7ef1014384613e394591fd9, type: 3}
+  m_PrefabInstance: {fileID: 577877875588461509}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1471519728
 GameObject:
   m_ObjectHideFlags: 0
@@ -85371,6 +85376,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 566576789}
     m_Modifications:
+    - target: {fileID: 4825778077423523659, guid: 3cdd95d7e7ef1014384613e394591fd9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5346722843290697966, guid: 3cdd95d7e7ef1014384613e394591fd9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7849277599345271149, guid: 3cdd95d7e7ef1014384613e394591fd9, type: 3}
       propertyPath: m_ActionEvents.Array.data[4].m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -85477,11 +85490,11 @@ PrefabInstance:
       objectReference: {fileID: 78868484}
     - target: {fileID: 8625475655797674624, guid: 3cdd95d7e7ef1014384613e394591fd9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 17.89
+      value: 19.55
       objectReference: {fileID: 0}
     - target: {fileID: 8625475655797674624, guid: 3cdd95d7e7ef1014384613e394591fd9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.9
+      value: 1.12
       objectReference: {fileID: 0}
     - target: {fileID: 8625475655797674624, guid: 3cdd95d7e7ef1014384613e394591fd9, type: 3}
       propertyPath: m_LocalPosition.z

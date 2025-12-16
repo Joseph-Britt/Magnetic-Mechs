@@ -178,7 +178,7 @@ public class TutorialAllEvents : MonoBehaviour
             Debug.Log("playerScript disappeared");
             yield break; 
         }
-        if (!playerScript.facingRight)
+        if (!playerScript.torsoFacingRight)
         {
             pilotsDeath.transform.localScale = new Vector3(pilotsDeath.transform.localScale.x * -1, pilotsDeath.transform.localScale.y, pilotsDeath.transform.localScale.z);
         }

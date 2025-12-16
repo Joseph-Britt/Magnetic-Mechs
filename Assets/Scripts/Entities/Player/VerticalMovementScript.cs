@@ -7,7 +7,6 @@ public class VerticalMovementScript : MonoBehaviour
 {
     [Header("Components")]
     public Rigidbody2D playerRigidBody;
-    public PlankScript handlePlanks;
     public Image remainingFuelImage;
     public GameObject remainingFuelParent;
 
@@ -15,24 +14,15 @@ public class VerticalMovementScript : MonoBehaviour
     public PlayerAnimationManagerScript playerAnimationManagerScript;
     public PlayerPhysicsScript playerPhysicsScript;
     public PlayerScript playerScript;
+    public GroundCheckScript playerGroundCheckScript;
 
     [Header("Variables")]
     private float maxYSpeed = 20f;
+    private bool trulyOnGround;
 
     [Header("Timers")]
     private float remainingFuelTimer = 0;
     private float remainingFuelTimeToDisappear = .5f;
-
-    [Header("Ground Checks")]
-    public bool onGround = false;
-    public bool overlappingGround = false;
-    public bool trulyOnGround = false;
-    public bool nearGround = false;
-    private float groundLength = .9f;
-    private float nearGroundLength = 1.25f;
-    private float legLength = .78f;
-    private Vector3 distanceToLeg = new Vector3(.42f, 0, 0);
-    public LayerMask groundLayer;
 
     [Header("Jumping")]
     public bool jumpPressed = false;
@@ -61,28 +51,15 @@ public class VerticalMovementScript : MonoBehaviour
 
     void Awake()
     {
-        groundLayer = LayerMask.GetMask("Ground", "Plank Ground");
         jetpackCurrentTime = jetpackTotalTime;
     }
 
     public bool handleVerticalUpdates(float verticalDirection, bool playerAlive, bool jump)
     {
         jumpPressed = jump;
-        if (verticalDirection <= -.25f && handlePlanks != null)
-        {
-            groundLayer = LayerMask.GetMask("Ground");
-            handlePlanks.disablePlanks();
-        }
-        else
-        {
-            {
-                groundLayer = LayerMask.GetMask("Ground", "Plank Ground");
-            }
-        }
-        onGround = (Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, groundLength, groundLayer));
-        overlappingGround = (Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, legLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, legLength, groundLayer));
-        trulyOnGround = onGround && !overlappingGround;
-        nearGround = Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, nearGroundLength, groundLayer) || Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, nearGroundLength, groundLayer) && !overlappingGround;
+        playerGroundCheckScript.setGroundLayer(verticalDirection);
+        trulyOnGround = playerGroundCheckScript.isTrulyOnGround();
+        bool nearGround = playerGroundCheckScript.isNearGround();
         if (playerAlive)
         {
             //playerAnimationManagerScript.setLanding(trulyOnGround, onGround, myRigidbody2D.linearVelocity.y);
@@ -204,7 +181,7 @@ public class VerticalMovementScript : MonoBehaviour
     void adjustMaxYSpeed()
     {
         //turns on damping if the player is above a certain y speed
-        float currentMaxSpeed = playerScript.getMagnetMaxYSpeed(maxYSpeed);
+        float currentMaxSpeed = playerScript.startMagnetMaxYSpeed(maxYSpeed);
         playerPhysicsScript.ApplyMaxVerticalSpeedDrag(currentMaxSpeed);
     }
 
@@ -217,22 +194,7 @@ public class VerticalMovementScript : MonoBehaviour
         jumpTimer = 0;
     }
 
-    public bool IsOnMovingPlatform(out Rigidbody2D platformRb)
-    {
-        platformRb = null;
-        RaycastHit2D hitLeft = Physics2D.Raycast(transform.position - distanceToLeg, Vector2.down, groundLength, groundLayer);
-        RaycastHit2D hitRight = Physics2D.Raycast(transform.position + distanceToLeg, Vector2.down, groundLength, groundLayer);
-        RaycastHit2D[] hits = { hitLeft, hitRight };
-        foreach (RaycastHit2D hit in hits)
-        {
-            if (hit.collider != null && hit.collider.CompareTag("MovingPlatform"))
-            {
-                platformRb = hit.collider.attachedRigidbody;
-                return true;
-            }
-        }
-        return false;
-    }
+
 
     public void PlayerKilled()
     {
@@ -242,26 +204,9 @@ public class VerticalMovementScript : MonoBehaviour
         jetpackBackwards.GetComponent<JetpackScript>().setJetpack(false);
     }
     
-    public bool returnTrulyOnGround()
-    {
-        return trulyOnGround;
-    }
     public bool returnJetpackOn()
     {
         return jetpackOn;
     }
-    public Vector3 getDistanceToLeg()
-    {
-        return distanceToLeg;
-    }
-    public float getGroundLength()
-    {
-        return groundLength;
-    }
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position - distanceToLeg, transform.position - distanceToLeg + Vector3.down * legLength);
-        Gizmos.DrawLine(transform.position + distanceToLeg, transform.position + distanceToLeg + Vector3.down * groundLength);
-    }
+
 }
