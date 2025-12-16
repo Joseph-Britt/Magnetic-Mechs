@@ -15,6 +15,8 @@ public class MagnetSpawnerScript : MonoBehaviour
     [Header("Components")]
     public GameObject magnetPrefab;
     public GameObject magnetSpawnpoint;
+    [Header("Scripts")]
+    public MagnetManagerScript magnetManagerScript;
     //private AudioSource audioBox;
 
     public GameObject player;
@@ -24,7 +26,8 @@ public class MagnetSpawnerScript : MonoBehaviour
         //audioBox = gameObject.GetComponent<AudioSource>();
         player = GameObject.FindGameObjectWithTag("Player");
         initializeMagnet();
-        player.GetComponent<PlayerScript>().setMagnet(myMagnet);
+        magnetManagerScript.setMagnet(myMagnet);
+        //player.GetComponent<PlayerScript>().setMagnet(myMagnet);
         magnetActive = false;
     }
     private void initializeMagnet()
