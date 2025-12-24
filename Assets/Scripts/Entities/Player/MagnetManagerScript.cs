@@ -23,6 +23,7 @@ public class MagnetManagerScript : MonoBehaviour
     private float maximumMagnetDistance = 30;
     private Vector2 magnetRelativePosition;
     private float magnetDistance;
+    public bool magnetActive = false;
     void Awake()
     {
         MagnetSpawner = GameObject.FindGameObjectWithTag("MagnetSpawner");
@@ -48,11 +49,13 @@ public class MagnetManagerScript : MonoBehaviour
                 {
                     if (!magnetAttractionAudio.isPlaying) magnetAttractionAudio.Play();
                 }
+                magnetActive = true;
             }
             else
             {
                 magnetAttractionAudio.Stop();
                 magnetRepulsionAudio.Stop();
+                magnetActive = false;
             }
         }
     }

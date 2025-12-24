@@ -9,17 +9,15 @@ public class PlayerPhysicsScript : MonoBehaviour
     public ParticleSystem changeDirectionDust;
     [Header("Gravity")]
     private float linearDrag = 3f;
-    public float gravity = 1f;
+    public float defaultGravity = 1f;
     private float fallMultiplier = 3f;
     [Header("Drag Values")]
     private float defaultDrag = .05f;
     private float clampXDrag = 2.5f;
     private float clampYDrag = 3.0f;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [Header("Scripts")]
+    public MagnetManagerScript magnetManagerScript;
+    public PlayerScript playerScript;
 
     // Update is called once per frame
     void Update()
@@ -68,28 +66,31 @@ public class PlayerPhysicsScript : MonoBehaviour
         }
         else
         {
-            playerRigidBody.gravityScale = gravity;
+            playerRigidBody.gravityScale = defaultGravity;
             playerRigidBody.linearDamping = linearDrag * .15f;
             if (jetpackOn)
             {
-                playerRigidBody.gravityScale = gravity / 2;
-            }
-            if (playerRigidBody.linearVelocity.y < 0f)
-            {
-                if (jetpackOn)
+                playerRigidBody.gravityScale = defaultGravity / 2;
+                if (playerRigidBody.linearVelocity.y < 0f)
                 {
                     playerRigidBody.linearDamping = linearDrag;
                 }
+            }
+            else
+            {
+                if (playerRigidBody.linearVelocity.y < 0f)
+                {
+                    playerRigidBody.gravityScale = defaultGravity * fallMultiplier;
+                }
                 else
                 {
-                    playerRigidBody.gravityScale = gravity * fallMultiplier;
+                    playerRigidBody.gravityScale = defaultGravity * fallMultiplier / 2;
                 }
             }
-            else if (playerRigidBody.linearVelocity.y > 0f && !jetpackOn)
+            if (magnetManagerScript.magnetActive)
             {
-                playerRigidBody.gravityScale = gravity * fallMultiplier / 2;
+                playerRigidBody.gravityScale = defaultGravity / 2;
             }
-
         }
     }
     private void CreateDust()

@@ -10774,6 +10774,7 @@ MonoBehaviour:
   magnetRepulsionAudio: {fileID: 7487317075014682717}
   magnetVisualEffectScript: {fileID: 901907471296822719}
   playerRigidBody: {fileID: 9179641807861509780}
+  magnetActive: 0
 --- !u!1 &1372574599022603173
 GameObject:
   m_ObjectHideFlags: 0
@@ -31545,7 +31546,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerRigidBody: {fileID: 9179641807861509780}
   changeDirectionDust: {fileID: 5553604537028236757}
-  gravity: 1
+  defaultGravity: 1
+  magnetManagerScript: {fileID: 3560627938554875985}
+  playerScript: {fileID: 8146532162362531920}
 --- !u!1 &3053015174678117454
 GameObject:
   m_ObjectHideFlags: 0
