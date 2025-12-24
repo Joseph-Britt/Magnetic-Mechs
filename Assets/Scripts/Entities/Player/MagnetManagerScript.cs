@@ -22,7 +22,7 @@ public class MagnetManagerScript : MonoBehaviour
     private float magnetBaseForceAttraction = -7f;
     private float maximumMagnetDistance = 30;
     private Vector2 magnetRelativePosition;
-    private float magnetDistance;
+    public float magnetDistance;
     public bool magnetActive = false;
     void Awake()
     {
@@ -149,5 +149,9 @@ public class MagnetManagerScript : MonoBehaviour
     public GameObject returnMyMagnet()
     {
         return myMagnet;
+    }
+    public float returnMagnetMaximumDistance()
+    {
+        return maximumMagnetDistance;
     }
 }

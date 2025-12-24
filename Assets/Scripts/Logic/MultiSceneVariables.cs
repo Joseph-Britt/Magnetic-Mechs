@@ -11,6 +11,8 @@ public class MultiSceneVariables : MonoBehaviour
     public static MultiSceneVariables multiSceneVariablesInstance;
     [Header("Checkpoint")]
     private int currCheckpoint = 0;
+    [Header("Difficulty")]
+    public int difficulty = 0;
     private void Awake()
     {
         if (multiSceneVariablesInstance != null && multiSceneVariablesInstance != this)
