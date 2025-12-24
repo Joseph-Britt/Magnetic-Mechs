@@ -86,10 +86,10 @@ public class PlayerPhysicsScript : MonoBehaviour
                 {
                     playerRigidBody.gravityScale = defaultGravity * fallMultiplier / 2;
                 }
-            }
-            if (magnetManagerScript.magnetActive)
-            {
-                playerRigidBody.gravityScale = defaultGravity / 2;
+                if (magnetManagerScript.magnetActive)
+                {
+                    playerRigidBody.gravityScale = defaultGravity / 2 * (4 - 3 * (magnetManagerScript.returnMagnetMaximumDistance() - magnetManagerScript.magnetDistance) / magnetManagerScript.returnMagnetMaximumDistance());
+                }
             }
         }
     }
