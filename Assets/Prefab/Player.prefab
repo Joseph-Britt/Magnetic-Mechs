@@ -10774,6 +10774,8 @@ MonoBehaviour:
   magnetRepulsionAudio: {fileID: 7487317075014682717}
   magnetVisualEffectScript: {fileID: 901907471296822719}
   playerRigidBody: {fileID: 9179641807861509780}
+  playerAnimationManagerScript: {fileID: 14804203553909824}
+  magnetDistance: 0
   magnetActive: 0
 --- !u!1 &1372574599022603173
 GameObject:
@@ -30885,6 +30887,7 @@ MonoBehaviour:
   Player: {fileID: 0}
   HealthSystem: {fileID: 0}
   Logic: {fileID: 0}
+  savedVariables: {fileID: 0}
   currentHealth: 0
   maxPossibleHealth: 18
   invincible: 0

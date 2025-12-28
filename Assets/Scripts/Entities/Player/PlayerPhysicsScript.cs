@@ -11,10 +11,14 @@ public class PlayerPhysicsScript : MonoBehaviour
     private float linearDrag = 3f;
     public float defaultGravity = 1f;
     private float fallMultiplier = 3f;
+    private float pressingDownGravityMultiplier = 1.8f;
     [Header("Drag Values")]
     private float defaultDrag = .05f;
     private float clampXDrag = 2.5f;
     private float clampYDrag = 3.0f;
+    private float pressingDownDragMultiplier = .3f;
+    [Header("Variables")]
+    private bool downPressed = false;
     [Header("Scripts")]
     public MagnetManagerScript magnetManagerScript;
     public PlayerScript playerScript;
@@ -66,11 +70,12 @@ public class PlayerPhysicsScript : MonoBehaviour
         }
         else
         {
-            playerRigidBody.gravityScale = defaultGravity;
+            float appliedGravity = defaultGravity;
+            //playerRigidBody.gravityScale = defaultGravity;
             playerRigidBody.linearDamping = linearDrag * .15f;
             if (jetpackOn)
             {
-                playerRigidBody.gravityScale = defaultGravity / 2;
+                appliedGravity = defaultGravity / 2;
                 if (playerRigidBody.linearVelocity.y < 0f)
                 {
                     playerRigidBody.linearDamping = linearDrag;
@@ -80,17 +85,45 @@ public class PlayerPhysicsScript : MonoBehaviour
             {
                 if (playerRigidBody.linearVelocity.y < 0f)
                 {
-                    playerRigidBody.gravityScale = defaultGravity * fallMultiplier;
+                    appliedGravity = defaultGravity * fallMultiplier;
+                    if (downPressed)
+                    {
+                        appliedGravity *= pressingDownGravityMultiplier;
+                    }
                 }
                 else
                 {
-                    playerRigidBody.gravityScale = defaultGravity * fallMultiplier / 2;
+                    appliedGravity = defaultGravity * fallMultiplier / 2;
+                    if (downPressed)
+                    {
+                        appliedGravity *= pressingDownGravityMultiplier;
+                        playerRigidBody.linearDamping = linearDrag * pressingDownDragMultiplier;
+                    }
                 }
-                if (magnetManagerScript.magnetActive)
+                if (magnetManagerScript.magnetActive && magnetManagerScript.returnMagnetMaximumDistance() > magnetManagerScript.magnetDistance)
                 {
-                    playerRigidBody.gravityScale = defaultGravity / 2 * (4 - 3 * (magnetManagerScript.returnMagnetMaximumDistance() - magnetManagerScript.magnetDistance) / magnetManagerScript.returnMagnetMaximumDistance());
+                    float distanceEffect = (magnetManagerScript.returnMagnetMaximumDistance() - magnetManagerScript.magnetDistance) / magnetManagerScript.returnMagnetMaximumDistance();
+                    float angleEffect = Mathf.Abs(Mathf.Cos(magnetManagerScript.returnPolarMagnetAngle() * Mathf.Deg2Rad));
+                    appliedGravity = defaultGravity * fallMultiplier / 2 * (4 - 2 * distanceEffect - angleEffect) / 4;
+                    //playerRigidBody.gravityScale = defaultGravity / 2 * (4 - 3 * );
+                    if (downPressed)
+                    {
+                        appliedGravity *= pressingDownGravityMultiplier;
+                    }
                 }
             }
+            playerRigidBody.gravityScale = appliedGravity;
+        }
+    }
+    public void SetDownPressed(float verticalDirection)
+    {
+        if(verticalDirection <= -.25f)
+        {
+            downPressed = true;
+        }
+        else
+        {
+            downPressed = false;
         }
     }
     private void CreateDust()

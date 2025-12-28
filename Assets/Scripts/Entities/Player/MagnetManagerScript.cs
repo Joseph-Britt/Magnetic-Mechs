@@ -14,6 +14,7 @@ public class MagnetManagerScript : MonoBehaviour
 
     [Header("Scripts")]
     private MagnetSpawnerScript magnetSpawnerScript;
+    public PlayerAnimationManagerScript playerAnimationManagerScript;
 
     [Header("Variables")]
     private float magnetDistanceMultiplyingForceRepulsion = 98;
@@ -39,7 +40,7 @@ public class MagnetManagerScript : MonoBehaviour
     {
         if (magnetAttractionAudio != null && magnetRepulsionAudio != null)
         {
-            if (repelOn ^ attractOn)
+            if (magnetSpawnerScript.magnetActive && (repelOn ^ attractOn))
             {
                 if (repelOn)
                 {
@@ -104,9 +105,13 @@ public class MagnetManagerScript : MonoBehaviour
         }
         playerRigidBody.AddForce(forceDirection * forceMagnitude, ForceMode2D.Force);
     }
-    public float getMagnetMaxYSpeed(float maxYSpeed, bool repelOn, bool attractOn)
+    public float getMagnetMaxYSpeed(float maxYSpeed, float maxYSpeedPressingDown, bool pressingDown, bool repelOn, bool attractOn)
     {
         float currentMaxSpeed = maxYSpeed;
+        if (pressingDown)
+        {
+            currentMaxSpeed = maxYSpeedPressingDown;
+        }
         if (repelOn ^ attractOn)
         {
             if (myMagnet != null && magnetSpawnerScript.magnetActive)
@@ -153,5 +158,10 @@ public class MagnetManagerScript : MonoBehaviour
     public float returnMagnetMaximumDistance()
     {
         return maximumMagnetDistance;
+    }
+    public float returnPolarMagnetAngle()
+    {
+        float originalAngle = Mathf.Atan2(magnetRelativePosition.y, magnetRelativePosition.x) * Mathf.Rad2Deg;
+        return playerAnimationManagerScript.convertToPolarCoordinates(originalAngle);
     }
 }
