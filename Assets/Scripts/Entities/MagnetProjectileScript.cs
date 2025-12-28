@@ -60,6 +60,5 @@ public class MagnetProjectileScript : MonoBehaviour
         {
             myMagnetSpawnerScript.magnetActive = false;
         }
-        //Destroy(gameObject);
     }
 }

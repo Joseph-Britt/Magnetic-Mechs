@@ -18,6 +18,7 @@ public class VerticalMovementScript : MonoBehaviour
 
     [Header("Variables")]
     private float maxYSpeed = 20f;
+    private float maxYSpeedPressingDown = 35f;
     private bool trulyOnGround;
 
     [Header("Timers")]
@@ -58,6 +59,7 @@ public class VerticalMovementScript : MonoBehaviour
     {
         jumpPressed = jump;
         playerGroundCheckScript.setGroundLayer(verticalDirection);
+        playerPhysicsScript.SetDownPressed(verticalDirection);
         trulyOnGround = playerGroundCheckScript.isTrulyOnGround();
         bool nearGround = playerGroundCheckScript.isNearGround();
         if (playerAlive)
@@ -143,12 +145,13 @@ public class VerticalMovementScript : MonoBehaviour
         }
     }
 
-    public void SetJetpackSprites(float direction)
+    public void SetJetpackSprites(float direction, float verticalDirection)
     {
-        jetpackLower.GetComponent<JetpackScript>().setJetpack(jetpackOn);
+        bool downPressed = verticalDirection <= -.25f;
+        jetpackLower.GetComponent<JetpackScript>().setJetpackDown(jetpackOn, downPressed, trulyOnGround);
         //jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(jetpackOn);
         jetpackBackwardsOn = !trulyOnGround && Mathf.Abs(direction) > 0;
-        jetpackBackwards.GetComponent<JetpackScript>().setJetpack(jetpackBackwardsOn);
+        jetpackBackwards.GetComponent<JetpackScript>().setJetpackBack(jetpackBackwardsOn);
     }
     public void handleVerticalMovement()
     {
@@ -181,7 +184,7 @@ public class VerticalMovementScript : MonoBehaviour
     void adjustMaxYSpeed()
     {
         //turns on damping if the player is above a certain y speed
-        float currentMaxSpeed = playerScript.startMagnetMaxYSpeed(maxYSpeed);
+        float currentMaxSpeed = playerScript.startMagnetMaxYSpeed(maxYSpeed, maxYSpeedPressingDown);
         playerPhysicsScript.ApplyMaxVerticalSpeedDrag(currentMaxSpeed);
     }
 
@@ -199,9 +202,9 @@ public class VerticalMovementScript : MonoBehaviour
     public void PlayerKilled()
     {
         if (jetpackAudio != null && jetpackAudio.isPlaying) jetpackAudio.Stop();
-        jetpackLower.GetComponent<JetpackScript>().setJetpack(false);
+        jetpackLower.GetComponent<JetpackScript>().setJetpackDown(false, false, true);
         //jetpackLowerRight.GetComponent<JetpackScript>().setJetpack(false);
-        jetpackBackwards.GetComponent<JetpackScript>().setJetpack(false);
+        jetpackBackwards.GetComponent<JetpackScript>().setJetpackBack(false);
     }
     
     public bool returnJetpackOn()

@@ -163,7 +163,7 @@ public class PlayerAnimationManagerScript : MonoBehaviour
             backDownArm.SetActive(true);
         }
     }
-    private float convertToPolarCoordinates(float originalAngle)
+    public float convertToPolarCoordinates(float originalAngle)
     {
         if(originalAngle >= -180 && originalAngle <= -90)
         {

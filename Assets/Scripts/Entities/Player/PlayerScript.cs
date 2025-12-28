@@ -131,7 +131,7 @@ public class PlayerScript : MonoBehaviour
         mousePosition = virtualCamera.ScreenToWorldPoint(Input.mousePosition);//orientation
         //Vertical
         jetpackOn = myVerticalMovementScript.handleVerticalUpdates(verticalDirection, playerAlive, jumpPressed);
-        myVerticalMovementScript.SetJetpackSprites(direction);
+        myVerticalMovementScript.SetJetpackSprites(direction, verticalDirection);
         //Magnet
         myMagnetManagerScript.SetMagnetAudio(repelOn, attractOn);
         if (shootingInput)
@@ -358,9 +358,10 @@ public class PlayerScript : MonoBehaviour
             lastMoveInputTime = Time.time;
         }
     }
-    public float startMagnetMaxYSpeed(float maxYSpeed)
+    public float startMagnetMaxYSpeed(float maxYSpeed, float maxYSpeedPressingDown)
     {
-        return myMagnetManagerScript.getMagnetMaxYSpeed(maxYSpeed, repelOn, attractOn);
+        bool pressingDown = verticalDirection <= -.25;
+        return myMagnetManagerScript.getMagnetMaxYSpeed(maxYSpeed, maxYSpeedPressingDown, pressingDown, repelOn, attractOn);
     }
     public float startMagnetMaxXSpeed(float maxXSpeed)
     {

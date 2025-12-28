@@ -37,7 +37,7 @@ public class TutorialAllPrompts : MonoBehaviour
     private string magnetingK = "Right Mouse to Shoot Magnet. Hold \"Left Shift/w\" to Repel/Attract";
     private string magnetingRepel = "Hold \"Left Shift\" to Repel";
     private string magnetingAttract = "Hold \"w\" to Attract. Red X Blocks will destroy the magnet if they touch it";
-    private string dropK = "Hold \"S\" To Drop Through Wooden Floors";
+    private string dropK = "Hold \"S\" To Drop Through Wooden Floors or to Fall Faster";
     private string killingPilotK= "Hold \"G\" + \"L\"";
     [Header("Prompt Output Strings gamePad")]
     private string moveRightG = "Use the Left Joystick to move";
