@@ -37,6 +37,10 @@ public class GroundCheckScript : MonoBehaviour
     private Vector3 distanceToLeg = new Vector3(.42f, 0, 0);
     public LayerMask groundLayer;
 
+    [Header("Coyote Time")]
+    private float coyoteTime = .1f;
+    private float coyoteTimer = 1f;
+
 
     void Awake()
     {
@@ -44,11 +48,17 @@ public class GroundCheckScript : MonoBehaviour
         groundLayer = LayerMask.GetMask("Ground", "Plank Ground");
     }
 
+    private void FixedUpdate()
+    {
+        coyoteTimer += Time.deltaTime;
+    }
+
     public bool isTrulyOnGround()
     {
         onGround = (Physics2D.Raycast(playerObject.transform.position - distanceToLeg, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(playerObject.transform.position + distanceToLeg, Vector2.down, groundLength, groundLayer));
         overlappingGround = (Physics2D.Raycast(playerObject.transform.position - distanceToLeg, Vector2.down, legLength, groundLayer) || Physics2D.Raycast(playerObject.transform.position + distanceToLeg, Vector2.down, legLength, groundLayer));
         trulyOnGround = onGround && !overlappingGround;
+        if (trulyOnGround) coyoteTimer = 0;
         return trulyOnGround;
     }
     public void setGroundLayer(float verticalDirection)
@@ -183,5 +193,9 @@ public class GroundCheckScript : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawLine(playerObject.transform.position - distanceToLeg, playerObject.transform.position - distanceToLeg + Vector3.down * legLength);
         Gizmos.DrawLine(playerObject.transform.position + distanceToLeg, playerObject.transform.position + distanceToLeg + Vector3.down * groundLength);
+    }
+    public bool recentlyGrounded()
+    {
+        return coyoteTimer <= coyoteTime;
     }
 }

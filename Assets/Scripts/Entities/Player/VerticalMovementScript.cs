@@ -20,6 +20,7 @@ public class VerticalMovementScript : MonoBehaviour
     private float maxYSpeed = 20f;
     private float maxYSpeedPressingDown = 35f;
     private bool trulyOnGround;
+    private bool recentlyOnGround;
 
     [Header("Timers")]
     private float remainingFuelTimer = 0;
@@ -62,6 +63,7 @@ public class VerticalMovementScript : MonoBehaviour
         playerPhysicsScript.SetDownPressed(verticalDirection);
         trulyOnGround = playerGroundCheckScript.isTrulyOnGround();
         bool nearGround = playerGroundCheckScript.isNearGround();
+        recentlyOnGround = playerGroundCheckScript.recentlyGrounded();
         if (playerAlive)
         {
             //playerAnimationManagerScript.setLanding(trulyOnGround, onGround, myRigidbody2D.linearVelocity.y);
@@ -100,7 +102,7 @@ public class VerticalMovementScript : MonoBehaviour
         if (jumpPressed)
         {
             jumpTimer = Time.time + jumpDelay;
-            if (trulyOnGround)
+            if (recentlyOnGround)
             {
                 maxYSpeedTimer = Time.time + maxYSpeedDelay;
             }
@@ -156,7 +158,7 @@ public class VerticalMovementScript : MonoBehaviour
     public void handleVerticalMovement()
     {
         //handles checks and related to vertical movement once every Update cycle
-        if (trulyOnGround && jumpTimer > Time.time)
+        if (recentlyOnGround && jumpTimer > Time.time)
         {
             jump();
         }
