@@ -14,8 +14,8 @@ public class PlayerPhysicsScript : MonoBehaviour
     private float pressingDownGravityMultiplier = 1.8f;
     [Header("Drag Values")]
     private float defaultDrag = .05f;
-    private float clampXDrag = 2.5f;
-    private float clampYDrag = 3.0f;
+    private float clampXDrag = 2.0f;
+    private float clampYDrag = 2.0f;
     private float pressingDownDragMultiplier = .3f;
     [Header("Variables")]
     private bool downPressed = false;

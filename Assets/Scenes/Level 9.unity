@@ -1884,7 +1884,7 @@ GameObject:
   - component: {fileID: 513968764}
   - component: {fileID: 513968766}
   - component: {fileID: 513968765}
-  m_Layer: 19
+  m_Layer: 12
   m_Name: lava floor damage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
