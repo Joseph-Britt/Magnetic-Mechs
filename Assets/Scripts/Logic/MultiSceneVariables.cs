@@ -24,6 +24,7 @@ public class MultiSceneVariables : MonoBehaviour
             multiSceneVariablesInstance = this;
             DontDestroyOnLoad(gameObject);
         }
+        difficulty = PlayerPrefs.GetInt(DifficultyScript.DIFFICULTY_STRING, 0);
     }
     public void setCheckpoint(int newPoint)
     {

@@ -242,13 +242,10 @@ public class PlayerScript : MonoBehaviour
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
-        Debug.Log("collision happened");
         if (!isCharging)
         {
-            Debug.Log("collision happened 2");
             if (collision.gameObject.layer == 7) // enemy
             {
-                Debug.Log("collision happened 3");
                 Vector2 relativePosition = transform.position - collision.transform.position;
                 float knockbackVal = 1;
                 if (collision.gameObject.tag == "RobotSpiderQueen")
@@ -380,6 +377,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (context.performed)
         {
+            Debug.Log("test");
             jumpPressed = true;
             lastJumpInputTime = Time.time;
             if (cutsceneManagerScript != null)

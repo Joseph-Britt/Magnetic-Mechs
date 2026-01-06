@@ -46,6 +46,10 @@ public class VerticalMovementScript : MonoBehaviour
     private bool jetpackOn;
     public AudioSource jetpackAudio;
 
+    [Header("Overused Jetpack")]
+    private bool jetpackAvailable = true;
+    private float jetpackRecoveryRatio = .5f;
+
     [Header("Jetpack Components")]
     public GameObject jetpackLower;
     public GameObject jetpackBackwards;
@@ -75,11 +79,13 @@ public class VerticalMovementScript : MonoBehaviour
             jetpackCurrentTime = jetpackTotalTime;
             handleJetPackTime();
         }
-        jetpackOn = jumpPressed && (!trulyOnGround);
+        checkReenableJetpack();
+        jetpackOn = jumpPressed && (!trulyOnGround) && jetpackAvailable;
         if (jetpackOn)
         {
             if (jetpackCurrentTime <= 0)
             {
+                jetpackAvailable = false;
                 jetpackOn = false;
             }
             else
@@ -199,7 +205,13 @@ public class VerticalMovementScript : MonoBehaviour
         jumpTimer = 0;
     }
 
-
+    private void checkReenableJetpack()
+    {
+        if((jetpackCurrentTime/jetpackTotalTime >= jetpackRecoveryRatio) || playerScript.lastJumpInputTime >= Time.time -.1f)
+        {
+            jetpackAvailable = true;
+        }
+    }
 
     public void PlayerKilled()
     {
@@ -213,5 +225,4 @@ public class VerticalMovementScript : MonoBehaviour
     {
         return jetpackOn;
     }
-
 }

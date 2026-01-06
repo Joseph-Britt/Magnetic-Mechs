@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class DifficultyScript : MonoBehaviour
 {
+    public const string DIFFICULTY_STRING = "Difficulty";
     [Header("Components")]
     //public Text currentDifficultyText;
     public List<GameObject> difficultyButtons;
@@ -29,14 +30,17 @@ public class DifficultyScript : MonoBehaviour
     public void SetNormal()
     {
         multiSceneVariables.difficulty = 0;
+        PlayerPrefs.SetInt(DIFFICULTY_STRING, multiSceneVariables.difficulty);
     }
     public void SetHard()
     {
         multiSceneVariables.difficulty = 1;
+        PlayerPrefs.SetInt(DIFFICULTY_STRING, multiSceneVariables.difficulty);
     }
     public void SetImpossible()
     {
         multiSceneVariables.difficulty = 2;
+        PlayerPrefs.SetInt(DIFFICULTY_STRING, multiSceneVariables.difficulty);
     }
     public void SetButtonSize(int currentSelection)
     {
