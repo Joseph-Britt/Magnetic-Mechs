@@ -23,6 +23,7 @@ public class LogicScript : MonoBehaviour
     public GameObject settingsScreen;
     public PlayerInput playerInput;
     public ButtonSelectionManager buttonSelectionManager;
+    public ControlScreenFade controlScreenFade;
 
     [Header("Singleton")]
     public static LogicScript logicSingleton;
@@ -147,12 +148,18 @@ public class LogicScript : MonoBehaviour
     }
     public void StartPostSpiderBossDelay()
     {
-        StartCoroutine(StartPostSpiderBoss(2f));
+        StartScreenFade(1.5f, 1.5f);
+        StartCoroutine(StartPostSpiderBoss(3.25f));
     }
     public IEnumerator StartPostSpiderBoss(float delay)
     {
         yield return new WaitForSeconds(delay);
         StartLevel("Level 8");
+    }
+    public void StartScreenFade(float duration = 1.0f, float delay = .25f)
+    {
+        Debug.Log("test1");
+        controlScreenFade.startFadeIn(duration, delay);
     }
     // public void StartPostBeeBossDelay()
     // {

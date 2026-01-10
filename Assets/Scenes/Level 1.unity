@@ -85806,6 +85806,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1258516770420041116 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9025116517882059354, guid: 80ada91b67b5d1c43b715a77187a2406, type: 3}
+  m_PrefabInstance: {fileID: 1258516770420041113}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97dbdae33ffc43040874d36ca77a01de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1723706097524000987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -85874,6 +85885,10 @@ PrefabInstance:
       propertyPath: settingsScreen
       value: 
       objectReference: {fileID: 1129159885}
+    - target: {fileID: 3552848714865772457, guid: 49fe211c275e1244da604cad44ac6f40, type: 3}
+      propertyPath: controlScreenFade
+      value: 
+      objectReference: {fileID: 1258516770420041116}
     - target: {fileID: 3552848714865772457, guid: 49fe211c275e1244da604cad44ac6f40, type: 3}
       propertyPath: remainingFuelText
       value: 
