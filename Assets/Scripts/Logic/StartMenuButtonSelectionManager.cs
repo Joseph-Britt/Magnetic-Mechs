@@ -37,7 +37,6 @@ public class StartMenuButtonSelectionManager : MonoBehaviour
 
     public void Move(InputAction.CallbackContext context)
     {
-        Debug.Log("test2");
         if (!isEnabled)
         {
             return;
@@ -96,5 +95,9 @@ public class StartMenuButtonSelectionManager : MonoBehaviour
     public void stopEnabling()
     {
         isEnabled = false;
+    }
+    public void startEnabling()
+    {
+        isEnabled = true;
     }
 }

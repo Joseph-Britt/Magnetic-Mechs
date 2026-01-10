@@ -8243,7 +8243,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelToLoad: Level 9
-  timeToWait: 0
 --- !u!1001 &1311806793
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13114,6 +13113,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8789221359772979889, guid: 273bd5890f396074087b59a65318091b, type: 3}
   m_PrefabInstance: {fileID: 1757213679}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1770511078 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9025116517882059354, guid: 80ada91b67b5d1c43b715a77187a2406, type: 3}
+  m_PrefabInstance: {fileID: 55027277}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97dbdae33ffc43040874d36ca77a01de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1793229473
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13207,7 +13217,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelToLoad: Main Menu
-  timeToWait: 1.5
 --- !u!61 &1808992692
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -17378,6 +17387,10 @@ PrefabInstance:
       propertyPath: settingsScreen
       value: 
       objectReference: {fileID: 55027280}
+    - target: {fileID: 3552848714865772457, guid: 49fe211c275e1244da604cad44ac6f40, type: 3}
+      propertyPath: controlScreenFade
+      value: 
+      objectReference: {fileID: 1770511078}
     - target: {fileID: 3552848714865772457, guid: 49fe211c275e1244da604cad44ac6f40, type: 3}
       propertyPath: remainingFuelText
       value: 

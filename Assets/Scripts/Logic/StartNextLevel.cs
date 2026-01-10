@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class StartNextLevel : MonoBehaviour
 {
     public string levelToLoad = "fill in here";
-    public float timeToWait = 1.5f;
+    private float timeToWait = 1.75f;
     [Header("Components")]
     private MultiSceneVariables multiSceneVariables;
     private LogicScript logic;
@@ -21,6 +21,7 @@ public class StartNextLevel : MonoBehaviour
     }
     public IEnumerator StartSpecifiedLevel()
     {
+        logic.StartScreenFade();
         if (multiSceneVariables != null) multiSceneVariables.setCheckpoint(0);
         yield return new WaitForSeconds(timeToWait);
         logic.StartLevel(levelToLoad);
