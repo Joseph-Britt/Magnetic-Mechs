@@ -11,6 +11,7 @@ public class PlayerHealthScript : MonoBehaviour
     private PlayerScript playerScript;
     public GameObject HealthSystem;
     public LogicScript Logic;
+    public MultiSceneVariables savedVariables;
     [Header("Health")]
     public float currentHealth;
     private float maxHealth = 10;
@@ -21,6 +22,19 @@ public class PlayerHealthScript : MonoBehaviour
     private void Awake()
     {
         Logic = GameObject.FindGameObjectWithTag("Logic").GetComponent<LogicScript>();
+        GameObject savedVariablesObject = GameObject.FindGameObjectWithTag("MultiSceneVariables");
+        if (savedVariablesObject != null)
+        {
+            float difficulty = savedVariablesObject.GetComponent<MultiSceneVariables>().difficulty;
+            if(difficulty == 2)
+            {
+                maxHealth = 3;
+            }
+            else if ( difficulty == 1)
+            {
+                maxHealth = 5;
+            }
+        }
         currentHealth = maxHealth;
         invincible = false;
     }
@@ -54,13 +68,13 @@ public class PlayerHealthScript : MonoBehaviour
         currentHealth -= Damage;
         if (currentHealth <= 0)
         {
-            currentHealth = 0;
             HandlePlayerDeath();
         }
         HealthSystem.GetComponent<HealthHeartScript>().UpdateHeartsHUD();
     }
     public void HandlePlayerDeath()
     {
+        currentHealth = 0;
         playerScript.KillPlayer();
         Logic.GameOver();
     }

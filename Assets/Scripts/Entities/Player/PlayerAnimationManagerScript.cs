@@ -54,7 +54,7 @@ public class PlayerAnimationManagerScript : MonoBehaviour
     {
         legGameObjectParent.transform.rotation = Quaternion.Euler(0, facingRight ? 0 : 180, 0);
     }
-    public void setFiringAngle(float originalAngle)
+    public bool setFiringAngle(float originalAngle)
     {
         float angle = convertToPolarCoordinates(originalAngle);
         if(angle < 0) 
@@ -88,6 +88,7 @@ public class PlayerAnimationManagerScript : MonoBehaviour
         }
         forwardArmRotationPoint.transform.right = directionAngle;
         backArmRotationPoint.transform.right = directionAngle;
+        return angle >= 0;
     }
     private Vector2 getDirection(float radAngle)
     {
@@ -162,7 +163,7 @@ public class PlayerAnimationManagerScript : MonoBehaviour
             backDownArm.SetActive(true);
         }
     }
-    private float convertToPolarCoordinates(float originalAngle)
+    public float convertToPolarCoordinates(float originalAngle)
     {
         if(originalAngle >= -180 && originalAngle <= -90)
         {
