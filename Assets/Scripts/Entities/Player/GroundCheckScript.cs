@@ -193,6 +193,8 @@ public class GroundCheckScript : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawLine(playerObject.transform.position - distanceToLeg, playerObject.transform.position - distanceToLeg + Vector3.down * legLength);
         Gizmos.DrawLine(playerObject.transform.position + distanceToLeg, playerObject.transform.position + distanceToLeg + Vector3.down * groundLength);
+        //Gizmos.color = Color.blue;
+        //Gizmos.DrawLine(playerObject.transform.position - distanceToLeg, playerObject.transform.position - distanceToLeg + Vector3.down * legLength);
     }
     public bool recentlyGrounded()
     {
