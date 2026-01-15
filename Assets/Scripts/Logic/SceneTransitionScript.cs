@@ -21,7 +21,7 @@ public class SceneTransitionScript : MonoBehaviour
     {
         if (collision.gameObject.layer == 3)
         {
-            logic.StartLevelTwo();
+            logic.StartLevel("Level 2");
         }
     }
 }
