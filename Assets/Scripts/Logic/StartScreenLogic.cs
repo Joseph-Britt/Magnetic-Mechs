@@ -1,89 +1,166 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class StartScreenLogic : MonoBehaviour
 {
+    public enum MenuState
+    {
+        StartScreen,
+        LevelSelect,
+        Settings
+    }
+
     //holds the logic for functions which are called into during the starting screen
     public GameObject startScreenStart;
     public GameObject startScreenLevelSelect;
+    public GameObject startScreenSettings;
+    //public GameObject backgroundCanvas;
     public MultiSceneVariables variableStorage;
     public PlayerInput myInput;
     public PlayerInput selectionInput;
+    public MainMenuButtonSelectionManager mainMenuButtonSelectionManager;
+    public StartMenuButtonSelectionManager startMenuButtonSelectionManager;
+    public SettingsButtonSelectionManager settingsButtonSelectionManager;
+    public MenuState currScreen = MenuState.StartScreen;// 0 = start screen, 1 = level select, 2 = settings
 
     private void Awake()
     {
         myInput = GetComponent<PlayerInput>();
+        myInput.SwitchCurrentActionMap("UI");
         variableStorage = GameObject.FindGameObjectWithTag("MultiSceneVariables").GetComponent<MultiSceneVariables>();
     }
+
+    public void returnToStartScreen()
+    {
+        currScreen = MenuState.StartScreen;
+        startMenuButtonSelectionManager.startEnabling();
+        startScreenStart.SetActive(true);
+        startScreenLevelSelect.SetActive(false);
+        startScreenSettings.SetActive(false);
+        //backgroundCanvas.SetActive(true);
+    }
+
     public void StartGame()
     {
+        currScreen = MenuState.LevelSelect;
+        startMenuButtonSelectionManager.stopEnabling();
         startScreenStart.SetActive(false);
         startScreenLevelSelect.SetActive(true);
+        //backgroundCanvas.SetActive(false);
     }
-    public void StartStage1()
+
+    public void GoToSettings()
+    {
+        currScreen = MenuState.Settings;
+        startMenuButtonSelectionManager.stopEnabling();
+        startScreenStart.SetActive(false);
+        startScreenSettings.SetActive(true);
+        //backgroundCanvas.SetActive(false);
+    }
+
+    public void StartStage(string level)
     {
         variableStorage.setCheckpoint(0);
-        SceneManager.LoadScene("Level 1");
+        SceneManager.LoadScene(level);
     }
-    public void StartStage2()
+    public void Quit()
     {
-        variableStorage.setCheckpoint(0);
-        SceneManager.LoadScene("Level 2");
+        Application.Quit();
     }
-    public void StartStage3()
+    //public void GamePadPressed(InputAction.CallbackContext context)
+    //{
+    //    if (context.performed)
+    //    {
+    //        variableStorage.gamePadNotMouse = true;
+    //        myInput.SwitchCurrentActionMap("UI");
+    //        StartGame();
+    //    }
+    //}
+    //public void StartGame(InputAction.CallbackContext context)
+    //{
+    //    if (context.performed)
+    //    {
+    //        variableStorage.gamePadNotMouse = false;
+    //        myInput.SwitchCurrentActionMap("UI");
+    //        StartGame();
+    //    }
+    //}
+    public void Move(InputAction.CallbackContext context)
     {
-        variableStorage.setCheckpoint(0);
-        SceneManager.LoadScene("Level 3");
-    }
-    public void StartStage4()
-    {
-        variableStorage.setCheckpoint(0);
-        SceneManager.LoadScene("Level 4");
-    }
-    public void StartStage5()
-    {
-        variableStorage.setCheckpoint(0);
-        SceneManager.LoadScene("Level 5");
-    }
-    public void StartStage6()
-    {
-        variableStorage.setCheckpoint(0);
-        SceneManager.LoadScene("Level 6");
-    }
-    public void StartStage7()
-    {
-        variableStorage.setCheckpoint(0);
-        SceneManager.LoadScene("Level 7");
-    }
-    public void StartStage8()
-    {
-        variableStorage.setCheckpoint(0);
-        SceneManager.LoadScene("Level 8");
-    }
-    public void StartStage9()
-    {
-        variableStorage.setCheckpoint(0);
-        SceneManager.LoadScene("Level 9");
-    }
-    public void GamePadPressed(InputAction.CallbackContext context)
-    {
-        if (context.performed)
+        switch (currScreen)
         {
-            variableStorage.gamePadNotMouse = true;
-            myInput.SwitchCurrentActionMap("UI");
-            StartGame();
+            case MenuState.StartScreen:
+                startMenuButtonSelectionManager.Move(context);
+                break;
+            case MenuState.LevelSelect:
+                mainMenuButtonSelectionManager.Move(context);
+                break;
+            case MenuState.Settings:
+                settingsButtonSelectionManager.Move(context);
+                break;
+            default:
+                break;
         }
+        //if (currScreen == 0)
+        //{
+        //    startMenuButtonSelectionManager.Move(context);
+        //}
+        //else if (currScreen == 1)
+        //{
+        //    mainMenuButtonSelectionManager.Move(context);
+        //}
+        //else
+        //{
+        //    settingsButtonSelectionManager.Move(context);
+        //}
     }
-    public void SpacePressed(InputAction.CallbackContext context)
+    public void Select(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        switch (currScreen)
         {
-            variableStorage.gamePadNotMouse = false;
-            myInput.SwitchCurrentActionMap("UI");
-            StartGame();
+            case MenuState.StartScreen:
+                startMenuButtonSelectionManager.Select(context);
+                break;
+            case MenuState.LevelSelect:
+                mainMenuButtonSelectionManager.Select(context);
+                break;
+            case MenuState.Settings:
+                settingsButtonSelectionManager.Select(context);
+                break;
+            default:
+                break;
         }
+        //if (currScreen == 0)
+        //{
+        //    startMenuButtonSelectionManager.Select(context);
+        //}
+        //else if (currScreen == 1)
+        //{
+        //    mainMenuButtonSelectionManager.Select(context);
+        //}
+        //else
+        //{
+        //    settingsButtonSelectionManager.Select(context);
+        //}
+    }
+    public void Escape(InputAction.CallbackContext context)
+    {
+        switch (currScreen)
+        {
+            case MenuState.LevelSelect:
+            case MenuState.Settings:
+                returnToStartScreen();
+                break;
+            default:
+                break;
+        }
+        //if (currScreen == 1 || currScreen == 2)
+        //{
+        //    returnToStartScreen();
+        //}
     }
 }

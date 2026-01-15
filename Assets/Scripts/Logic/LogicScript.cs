@@ -23,6 +23,7 @@ public class LogicScript : MonoBehaviour
     public GameObject settingsScreen;
     public PlayerInput playerInput;
     public ButtonSelectionManager buttonSelectionManager;
+    public ControlScreenFade controlScreenFade;
 
     [Header("Singleton")]
     public static LogicScript logicSingleton;
@@ -56,45 +57,11 @@ public class LogicScript : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public void StartLevelTwo()
+    public void StartLevel(string level)
     {
         multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 2");
-    }
-    public void StartLevelThree()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 3");
-    }
-    public void StartLevelFour()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 4");
-    }
-    public void StartLevelFive()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 5");
-    }
-    public void StartLevelSix()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 6");
-    }
-    public void StartLevelSeven()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 7");
-    }
-    public void StartLevelEight()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 8");
-    }
-    public void StartLevelNine()
-    {
-        multiSceneVariables.setCheckpoint(0);
-        SceneManager.LoadScene("Level 9");
+        PlayerPrefs.SetInt(level, 1);
+        SceneManager.LoadScene(level);
     }
     public void StartLevelSelect()
     {
@@ -181,12 +148,18 @@ public class LogicScript : MonoBehaviour
     }
     public void StartPostSpiderBossDelay()
     {
-        StartCoroutine(StartPostSpiderBoss(3f));
+        StartScreenFade(1.5f, 1.5f);
+        StartCoroutine(StartPostSpiderBoss(3.25f));
     }
     public IEnumerator StartPostSpiderBoss(float delay)
     {
         yield return new WaitForSeconds(delay);
-        StartLevelFive();
+        StartLevel("Level 8");
+    }
+    public void StartScreenFade(float duration = 1.0f, float delay = .25f)
+    {
+        Debug.Log("test1");
+        controlScreenFade.startFadeIn(duration, delay);
     }
     // public void StartPostBeeBossDelay()
     // {

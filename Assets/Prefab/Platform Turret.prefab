@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 3994251031738334306, guid: d6e9387bbd5b74a44bc8a49ffde61b60, type: 3}
-  MuzzlePrefab: {fileID: 625931192793893498, guid: fa3192597ace39c45a07148447780202, type: 3}
+  MuzzlePrefab: {fileID: 7979376225253518298, guid: ca51ecd2ec7acfb45ab1d25f94471549, type: 3}
   bulletSpawnpoint: {fileID: 1010024946081967214}
   muzzleSpawnpoint: {fileID: 7915317549636319739}
   turretHolder: {fileID: 5752900602501702395}
@@ -218,7 +218,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 881e3f52c86c94f26a60718d35627cd8, type: 3}
   m_Resource: {fileID: 8300000, guid: 881e3f52c86c94f26a60718d35627cd8, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 0
   m_Pitch: 1
   Loop: 0
   Mute: 0
