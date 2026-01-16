@@ -4,8 +4,7 @@ public class IndividualRockSpawnerScript : MonoBehaviour
 {
     [Header("Components")]
     public GameObject rock;
-    //SpriteRenderer mySpriteRenderer;
-    private ParticleSystem myParticleSystem;
+    SpriteRenderer mySpriteRenderer;
     [Header("Variables")]
     private float timeToSpawn = 1f;
     private float timer = 0f;
@@ -13,8 +12,7 @@ public class IndividualRockSpawnerScript : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
-        //mySpriteRenderer = GetComponent<SpriteRenderer>();
-        myParticleSystem = GetComponent<ParticleSystem>();
+        mySpriteRenderer = GetComponent<SpriteRenderer>();
         rock.SetActive(false);
     }
 
@@ -37,15 +35,13 @@ public class IndividualRockSpawnerScript : MonoBehaviour
     }
     public void startSpawningRock()
     {
-        //mySpriteRenderer.enabled = true;
-        myParticleSystem.Play();
+        mySpriteRenderer.enabled = true;
         timer = 0f;
         hasSpawned = false;
     }
     private void spawnRock()
     {
-        //mySpriteRenderer.enabled = false;
-        myParticleSystem.Stop();
+        mySpriteRenderer.enabled = false;
         rock.transform.position = transform.position;
         rock.SetActive(true);
     }

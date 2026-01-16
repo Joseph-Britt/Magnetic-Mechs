@@ -22,9 +22,6 @@ public class ButtonSelectionManager : MonoBehaviour
 
     private List<GameObject> buttons;
     private bool isEnabled;
-    public GameObject pauseEffect;
-
-    [SerializeField] private float[] pauseEffectHeights;
 
     private void Awake()
     {
@@ -80,10 +77,6 @@ public class ButtonSelectionManager : MonoBehaviour
         foreach (GameObject button in buttons) 
         {
             button.GetComponent<RectTransform>().localScale = Vector3.one;
-        }
-        if (pauseEffect.activeInHierarchy)
-        {
-            pauseEffect.transform.localPosition = new Vector3(pauseEffect.transform.localPosition.x, pauseEffectHeights[currentSelection], 0f);
         }
         buttons[currentSelection].GetComponent<RectTransform>().localScale = new Vector3(1.25f, 1.25f, 1.25f);
     }

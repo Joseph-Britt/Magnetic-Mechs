@@ -4,21 +4,15 @@ using UnityEngine;
 
 public class MagnetProjectileScript : MonoBehaviour
 {
-    [Header("Componenets")]
-    private LayerMask groundLayer;
-    private CapsuleCollider2D capsuleCollider;
     //code for the magnet projectile
     private float deathTime;
     private float startCollidingTime;
     private Rigidbody2D myRigidBody;
     private bool attached;
     public MagnetSpawnerScript myMagnetSpawnerScript;
-    
     private void Awake()
     {
-        capsuleCollider = GetComponent<CapsuleCollider2D>();
         myRigidBody = GetComponent<Rigidbody2D>();
-        groundLayer = LayerMask.GetMask("Ground");
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -26,9 +20,11 @@ public class MagnetProjectileScript : MonoBehaviour
         {
             if (collision.gameObject.CompareTag("MovingPlatform"))
             {
-                Attach();
+                myRigidBody.linearVelocity = Vector3.zero;
+                GetComponent<CapsuleCollider2D>().enabled = false;
                 myRigidBody.bodyType = RigidbodyType2D.Kinematic;
                 gameObject.transform.SetParent(collision.transform);
+                attached = true;
             }
             else if (collision.gameObject.CompareTag("NonStickPlatform"))
             {
@@ -36,7 +32,9 @@ public class MagnetProjectileScript : MonoBehaviour
             }
             else
             {
-                Attach();
+                myRigidBody.linearVelocity = Vector3.zero;
+                GetComponent<CapsuleCollider2D>().enabled = false;
+                attached = true;
             }
         }
     }
@@ -49,7 +47,7 @@ public class MagnetProjectileScript : MonoBehaviour
     }
     public void Reset()
     {
-        capsuleCollider.enabled = true;
+        GetComponent<CapsuleCollider2D>().enabled = true;
         myRigidBody.bodyType = RigidbodyType2D.Dynamic;
         gameObject.transform.parent = null;
         deathTime = Time.time + 5;
@@ -62,36 +60,6 @@ public class MagnetProjectileScript : MonoBehaviour
         {
             myMagnetSpawnerScript.magnetActive = false;
         }
+        //Destroy(gameObject);
     }
-    public void Attach()
-    {
-        myRigidBody.linearVelocity = Vector3.zero;
-        capsuleCollider.enabled = false;
-        attached = true;
-        //Vector2 myTransform = (Vector2) transform;
-        //Vector2 startPos = (Vector2)transform.position + (Vector2) transform.right * .35f + (Vector2) transform.up * .25f;
-        //RaycastHit2D hit = Physics2D.Raycast(startPos, -(Vector2)transform.up, .5f, groundLayer);
-        Vector2 startPos = (Vector2)transform.position - (Vector2)transform.right * .35f;
-        RaycastHit2D hit = Physics2D.Raycast(startPos, (Vector2)transform.right + (Vector2)transform.up * .3f, 1f, groundLayer);
-        if(hit.collider == null)
-        {
-            hit = Physics2D.Raycast(startPos, (Vector2)transform.right - (Vector2)transform.up * .3f, 1f, groundLayer);
-        }
-        if(hit.collider != null)
-        {
-            Vector2 newNormal = hit.normal;
-            float newAngle = Mathf.Atan2(newNormal.y, newNormal.x) * Mathf.Rad2Deg;
-            Quaternion newRotation = Quaternion.Euler(0, 0, newAngle + 180);
-            transform.rotation = newRotation;
-            transform.position = hit.point;
-        }
-    }
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.red;
-    //    //Vector2 startPos = (Vector2) transform.position + Vector2.right * .35f + Vector2.up * .25f;
-    //    //Gizmos.DrawLine(startPos, startPos - (Vector2) transform.up * .5f);
-    //    Vector2 startPos = (Vector2)transform.position - (Vector2)transform.right * .35f;
-    //    Gizmos.DrawLine(startPos, startPos + (Vector2) transform.right * 1f);
-    //}
 }

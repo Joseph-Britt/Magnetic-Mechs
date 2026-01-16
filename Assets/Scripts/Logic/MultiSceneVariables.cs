@@ -11,8 +11,6 @@ public class MultiSceneVariables : MonoBehaviour
     public static MultiSceneVariables multiSceneVariablesInstance;
     [Header("Checkpoint")]
     private int currCheckpoint = 0;
-    [Header("Difficulty")]
-    public int difficulty = 0;
     private void Awake()
     {
         if (multiSceneVariablesInstance != null && multiSceneVariablesInstance != this)
@@ -24,7 +22,6 @@ public class MultiSceneVariables : MonoBehaviour
             multiSceneVariablesInstance = this;
             DontDestroyOnLoad(gameObject);
         }
-        difficulty = PlayerPrefs.GetInt(DifficultyScript.DIFFICULTY_STRING, 0);
     }
     public void setCheckpoint(int newPoint)
     {

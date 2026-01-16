@@ -40,6 +40,7 @@ public class HealthHeartScript : MonoBehaviour
     }
     public void UpdateHeartsHUD()
     {
+        Debug.Log("updating UI");
         if (PlayerHealth == null)
         {
             Debug.Log("PlayerHealth Could not be found");

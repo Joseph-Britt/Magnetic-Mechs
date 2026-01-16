@@ -14,7 +14,6 @@ public class BeeBossScript : MonoBehaviour
     public BeeBossHealthScript beeBossHealthScript;
     public SpriteRenderer sprite;
     public Transform playerTransform;
-    public PlayerScript playerScript;
     public GameObject endingPlatformGrid;
     public GameObject StartNextLevel;
 
@@ -22,10 +21,9 @@ public class BeeBossScript : MonoBehaviour
     void Awake()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null) playerScript = player.GetComponent<PlayerScript>();
         if (player != null) playerTransform = player.GetComponent<Transform>();
         else Debug.Log("player could not be found");
-        //sprite = GetComponent<SpriteRenderer>();
+        sprite = GetComponent<SpriteRenderer>();
         endingPlatformGrid.SetActive(false);
         bossActive = false;
     }
@@ -34,13 +32,6 @@ public class BeeBossScript : MonoBehaviour
         if (collision.gameObject.layer == 8)
         {
             damageBoss(bulletDamage);
-        }
-    }
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.layer == 3)
-        {
-            playerScript.DamagePlayer(1, new Vector2(-.5f, 1), 1f);
         }
     }
     private void OnCollisionStay2D(Collision2D collision)

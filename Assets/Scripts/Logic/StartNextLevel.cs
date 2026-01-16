@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class StartNextLevel : MonoBehaviour
 {
     public string levelToLoad = "fill in here";
-    private float timeToWait = 1.75f;
+    public float timeToWait = 1.5f;
     [Header("Components")]
     private MultiSceneVariables multiSceneVariables;
     private void Awake()
@@ -19,7 +19,6 @@ public class StartNextLevel : MonoBehaviour
     }
     public IEnumerator StartSpecifiedLevel()
     {
-        logic.StartScreenFade();
         if (multiSceneVariables != null) multiSceneVariables.setCheckpoint(0);
         yield return new WaitForSeconds(timeToWait);
         SceneManager.LoadScene(levelToLoad);
